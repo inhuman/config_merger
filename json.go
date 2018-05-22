@@ -3,24 +3,24 @@ package configMerger
 import (
 	"io/ioutil"
 	"encoding/json"
-	"fmt"
 )
 
 type JsonSource struct {
 	Path string
 }
 
-func (j *JsonSource) Load(s interface{}) {
+func (j *JsonSource) Load(s interface{}) error {
 
 	file, err := ioutil.ReadFile(j.Path)
 
 	if err != nil {
-		fmt.Println(err)
+		return err
 	}
 
 	err = json.Unmarshal([]byte(file), s)
 	if err != nil {
-		fmt.Println(err)
+		return err
 	}
-}
 
+	return nil
+}

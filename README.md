@@ -1,10 +1,12 @@
 # configMerger
-Config tool for merge configs from different sources
+Config tool for merge configs from different sources. Nested configs not supports
 
 Now supports:
 - json file
 - consul kv
 - vault
+
+
 
 ### Usage
 
@@ -52,7 +54,11 @@ func main()  {
 
 	merger.MergeConfigs()
 
-	fmt.Println(merger.GetFinalConfig())
+    // There is two ways to get final config
+
+    fmt.Printf("%s", merger.GetFinalConfig()) // return map[string]interface{}
+
+    fmt.Printf("%s", cnf) // return struct
 }
 
 ```

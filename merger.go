@@ -1,5 +1,7 @@
 package configMerger
 
+import "github.com/fatih/structs"
+
 type Merger struct {
 	Sources []Source
 	TargetConfigStruct interface{}
@@ -7,7 +9,7 @@ type Merger struct {
 
 
 type Source interface {
-	Load(s interface{})
+	Load(s interface{}) error
 }
 
 func NewMerger() *Merger {
@@ -30,6 +32,6 @@ func (m *Merger) MergeConfigs() {
 }
 
 
-func (m *Merger) GetFinalConfig() interface{} {
-	return m.TargetConfigStruct
+func (m *Merger) GetFinalConfig() map[string]interface{} {
+	return structs.Map(m.TargetConfigStruct)
 }

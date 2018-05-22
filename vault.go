@@ -2,25 +2,29 @@ package configMerger
 
 import (
 	"github.com/hashicorp/vault/api"
-	"fmt"
 	"net/http"
 	"encoding/json"
 )
 
 type VaultSource struct {
-	Address string
-	Token   string
-	Prefix  string
-	Value   string
+	Address    string
+	Token      string
+	Prefix     string
+	HttpClient *http.Client
 }
 
-func (j *VaultSource) Load(s interface{}) {
+func (j *VaultSource) Load(s interface{}) error {
 
 	config := api.DefaultConfig()
+
+	if j.HttpClient != nil {
+		config.HttpClient = j.HttpClient
+	}
+
 	client, err := api.NewClient(config)
 
 	if err != nil {
-		fmt.Println(err)
+		return err
 	}
 
 	tokenHeader := http.Header{}
@@ -32,21 +36,25 @@ func (j *VaultSource) Load(s interface{}) {
 	secret, err := client.Logical().Read(j.Prefix)
 
 	if err != nil {
-		fmt.Println(err)
-	} else {
+		return err
+	}
 
-		if secret != nil {
+	if secret != nil {
 
-			b, err := json.Marshal(secret.Data)
-			if err != nil {
-				fmt.Println(err)
-			}
+		b, err := json.Marshal(secret.Data)
+		if err != nil {
+			return err
+		}
 
-			err = json.Unmarshal(b, s)
-			if err != nil {
-				fmt.Println(err)
-			}
-
+		err = json.Unmarshal(b, s)
+		if err != nil {
+			return err
 		}
 	}
+
+	return nil
+}
+
+func (j *VaultSource) SetHttpClient(httpClient *http.Client) {
+	j.HttpClient = httpClient
 }
