@@ -15,8 +15,12 @@ package configMerger
 
 import "fmt"
 
-type Cnf struct {
-	Message string `json:"message"`
+type Config struct {
+	Message    string  `json:"message"`
+	IntValue   int     `json:"int_value"`
+	FloatValue float32 `json:"float_value"`
+	Login      string  `json:"login"`
+	Password   string  `json:"password"`
 }
 
 // Override priority depends order of adding - last overrides previous
