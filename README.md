@@ -19,7 +19,7 @@ type Cnf struct {
 	Message string `json:"message"`
 }
 
-
+// Override priority depends order of adding - last overrides previous
 func main()  {
 
 	// create config struct
@@ -60,5 +60,5 @@ func main()  {
 
     fmt.Printf("%s", cnf) // return struct
 }
-
 ```
+
