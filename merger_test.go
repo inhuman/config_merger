@@ -15,12 +15,6 @@ type Cnf struct {
 	Message string `json:"message"`
 }
 
-func TestMergerFull(t *testing.T) {
-
-
-
-
-}
 
 func TestMerger_AddSource(t *testing.T) {
 	merger := NewMerger()

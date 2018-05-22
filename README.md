@@ -35,7 +35,7 @@ func main()  {
 
 	// add consul kv source
 	consulKvSource := &KvSource{
-		Address: "consul.addr.local:8500",
+		Address: "consul.addr:8500",
 		Prefix: "conf_merger/json",
 		Datacenter: "experiments",
 	}
