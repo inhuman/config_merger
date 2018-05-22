@@ -6,7 +6,7 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func TestJsonSource_Load(t *testing.T) {
+func TestJsonSource_LoadSuccess(t *testing.T) {
 
 	fh := createFileForTest(t, `{"message": "from json"}`)
 	path := fh.Name()
@@ -19,8 +19,25 @@ func TestJsonSource_Load(t *testing.T) {
 
 	cnf := &Cnf{}
 
-	jsonSource.Load(cnf)
+	err := jsonSource.Load(cnf)
+	assert.NoError(t, err)
 
 	assert.Equal(t, &Cnf{Message: "from json"}, cnf)
 
+}
+
+func TestJsonSource_LoadWrongJson(t *testing.T) {
+
+	fh := createFileForTest(t, `{"message": "from json",}`)
+	path := fh.Name()
+	defer func() {
+		fh.Close()
+		os.Remove(path)
+	}()
+
+	jsonSource := &JsonSource{Path: path}
+	cnf := &Cnf{}
+
+	err := jsonSource.Load(cnf)
+	assert.Error(t, err)
 }

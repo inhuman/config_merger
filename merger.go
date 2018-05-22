@@ -1,12 +1,14 @@
 package configMerger
 
-import "github.com/fatih/structs"
+import (
+	"github.com/fatih/structs"
+	"github.com/hashicorp/go-multierror"
+)
 
 type Merger struct {
-	Sources []Source
+	Sources            []Source
 	TargetConfigStruct interface{}
 }
-
 
 type Source interface {
 	Load(s interface{}) error
@@ -25,12 +27,24 @@ func (m *Merger) AddSource(src Source) {
 	m.Sources = append(m.Sources, src)
 }
 
-func (m *Merger) MergeConfigs() {
-	for _, s := range m.Sources {
-		s.Load(m.TargetConfigStruct)
-	}
-}
+func (m *Merger) MergeConfigs() error {
 
+	var errAll *multierror.Error
+
+	for _, s := range m.Sources {
+		err := s.Load(m.TargetConfigStruct)
+		if err != nil {
+			errAll = multierror.Append(errAll, err)
+		}
+	}
+
+	if errAll != nil {
+		if len(errAll.Errors) > 0 {
+			return errAll
+		}
+	}
+	return nil
+}
 
 func (m *Merger) GetFinalConfig() map[string]interface{} {
 	return structs.Map(m.TargetConfigStruct)

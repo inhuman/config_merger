@@ -7,7 +7,7 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func TestVaultSource_Load(t *testing.T) {
+func TestVaultSource_LoadSuccess(t *testing.T) {
 
 	defer gock.Off()
 
@@ -42,4 +42,22 @@ func TestVaultSource_Load(t *testing.T) {
 	err := vaultSource.Load(cnf)
 	assert.NoError(t, err)
 	assert.Equal(t, "from vault", cnf.Message)
+}
+
+func TestVaultSource_LoadWrongAddr(t *testing.T) {
+
+	vaultSource := &VaultSource{
+		Address: "http://vault.example.local",
+		Token: "dummy_token",
+		Prefix: "secret/test/config_merger",
+	}
+	cnf := &Cnf{}
+
+	client := &http.Client{Transport: &http.Transport{}}
+	gock.InterceptClient(client)
+
+	vaultSource.SetHttpClient(client)
+
+	err := vaultSource.Load(cnf)
+	assert.Error(t, err)
 }

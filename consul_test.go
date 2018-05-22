@@ -7,7 +7,7 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func TestKvSource_Load(t *testing.T) {
+func TestKvSource_LoadSuccess(t *testing.T) {
 
 	defer gock.Off()
 
@@ -41,4 +41,22 @@ func TestKvSource_Load(t *testing.T) {
 
 	assert.NoError(t, err)
 	assert.Equal(t, "from kv", cnf.Message)
+}
+
+func TestKvSource_LoadWrongAddr(t *testing.T) {
+
+	kvSource := &KvSource{
+		Address:    "consul.example.local:8500",
+		Datacenter: "test",
+		Prefix:     "test/prefix",
+	}
+
+	client := &http.Client{Transport: &http.Transport{}}
+	gock.InterceptClient(client)
+
+	kvSource.SetHttpClient(client)
+
+	cnf := &Cnf{}
+	err := kvSource.Load(cnf)
+	assert.Error(t, err)
 }
