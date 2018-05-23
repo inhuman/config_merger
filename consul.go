@@ -82,6 +82,6 @@ func handle(u uint64, i interface{}) {
 	}
 
 	for k, v := range kvs {
-		fmt.Printf("key: %v, value: %v", k, v)
+		fmt.Printf("key: %v, value: %s", k, v.Value)
 	}
 }
