@@ -14,7 +14,7 @@ type KvSource struct {
 	Datacenter   string
 	Prefix       string // like this "prefix" (without the /)
 	HttpClient   *http.Client
-	WatchHandler func(i interface{})
+	WatchHandler func()
 	TargetStruct interface{}
 }
 
@@ -63,9 +63,6 @@ func (j *KvSource) Watch() error {
 		return err
 	}
 
-
-	fmt.Printf("%+v\n", j.TargetStruct)
-
 	wp.Datacenter = j.Datacenter
 	wp.Handler = j.handle
 
@@ -73,7 +70,6 @@ func (j *KvSource) Watch() error {
 		wp.Run(j.Address)
 		time.Sleep(time.Second)
 	}
-
 
 	return nil
 }
@@ -89,10 +85,11 @@ func (j *KvSource) handle(u uint64, i interface{}) {
 		return
 	}
 
-	j.Load()
-
-	j.WatchHandler("")
-
-
+	err := j.Load()
+	if err == nil {
+		j.WatchHandler()
+	} else {
+		fmt.Println(err)
+	}
 }
 
