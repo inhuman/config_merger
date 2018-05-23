@@ -58,6 +58,8 @@ func (j *KvSource) SetHttpClient(httpClient *http.Client) {
 
 func (j *KvSource) Watch()  {
 
+	fmt.Println("Run kv watcher")
+
 	if j.WatchHandler != nil {
 		wp, err := watch.Parse(map[string]interface{}{"type": "keyprefix", "prefix": j.Prefix})
 		if err != nil {
