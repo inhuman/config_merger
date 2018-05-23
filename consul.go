@@ -4,6 +4,8 @@ import (
 	"github.com/hashicorp/consul/api"
 	"encoding/json"
 	"net/http"
+	"github.com/hashicorp/consul/watch"
+	"fmt"
 )
 
 type KvSource struct {
@@ -46,3 +48,32 @@ func (j *KvSource) Load(s interface{}) error {
 func (j *KvSource) SetHttpClient(httpClient *http.Client) {
 	j.HttpClient = httpClient
 }
+
+func (j *KvSource) Watch() error {
+
+	wp, err := watch.Parse(map[string]interface{}{"type": "keyprefix", "prefix": j.Prefix})
+	if err != nil {
+		return err
+	}
+
+	wp.Datacenter = j.Datacenter
+
+	wp.Handler = func(u uint64, i interface{}) {
+		if i == nil {
+			return
+		}
+
+		kvs, ok := i.(api.KVPairs)
+		if !ok {
+			return
+		}
+
+		fmt.Printf("%v", kvs)
+	}
+
+	go wp.Run(j.Address)
+
+
+	return nil
+}
+

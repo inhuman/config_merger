@@ -49,3 +49,7 @@ func (m *Merger) MergeConfigs() error {
 func (m *Merger) GetFinalConfig() map[string]interface{} {
 	return structs.Map(m.TargetConfigStruct)
 }
+
+
+//TODO: add kv watcher
+//TODO: add json watcher

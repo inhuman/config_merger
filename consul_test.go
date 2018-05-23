@@ -60,3 +60,4 @@ func TestKvSource_LoadWrongAddr(t *testing.T) {
 	err := kvSource.Load(cnf)
 	assert.Error(t, err)
 }
+
