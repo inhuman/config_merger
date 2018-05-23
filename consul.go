@@ -61,27 +61,15 @@ func (j *KvSource) Watch() error {
 	wp.Datacenter = j.Datacenter
 
 
-	wp.Handler = func(u uint64, i interface{}) {
-
-		fmt.Println("Watch plan handler")
-
-		if i == nil {
-			return
-		}
-
-		kvs, ok := i.(api.KVPairs)
-		if !ok {
-			return
-		}
-
-		for k, v := range kvs {
-			fmt.Printf("key: %v, value: %v", k, v)
-		}
-	}
+	wp.Handler = handle
 
 	fmt.Printf("%+v\n", wp)
 
-	go wp.Run(j.Address)
+	for {
+		go wp.Run(j.Address)
+	}
+
+
 
 	fmt.Println("Exiting..")
 
@@ -89,3 +77,20 @@ func (j *KvSource) Watch() error {
 	return nil
 }
 
+func handle(u uint64, i interface{}) {
+
+	fmt.Println("Watch plan handler")
+
+	if i == nil {
+		return
+	}
+
+	kvs, ok := i.(api.KVPairs)
+	if !ok {
+		return
+	}
+
+	for k, v := range kvs {
+		fmt.Printf("key: %v, value: %v", k, v)
+	}
+}
