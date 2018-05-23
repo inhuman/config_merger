@@ -60,7 +60,12 @@ func (j *KvSource) Watch()  {
 
 	fmt.Println("Run kv watcher")
 
+	fmt.Printf("%p", j.WatchHandler)
+
 	if j.WatchHandler != nil {
+
+		fmt.Println("Conditions success")
+
 		wp, err := watch.Parse(map[string]interface{}{"type": "keyprefix", "prefix": j.Prefix})
 		if err != nil {
 			return
