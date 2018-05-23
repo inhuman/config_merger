@@ -3,7 +3,6 @@ package configMerger
 import (
 	"github.com/fatih/structs"
 	"github.com/hashicorp/go-multierror"
-	"fmt"
 )
 
 type Merger struct {
@@ -26,11 +25,6 @@ func (m *Merger) AddTargetConfigStruct(s interface{}) {
 
 func (m *Merger) AddSource(src Source) {
 	src.SetTargetStruct(m.TargetConfigStruct)
-
-	fmt.Printf("%+v\n", src)
-	fmt.Printf("%+v\n", m.TargetConfigStruct)
-
-
 	m.Sources = append(m.Sources, src)
 }
 
