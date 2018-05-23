@@ -64,6 +64,9 @@ func (j *KvSource) Watch() error {
 		return err
 	}
 
+	fmt.Println(reflect.TypeOf(j.TargetStruct))
+	fmt.Printf("%+v\n", j.TargetStruct)
+
 	wp.Datacenter = j.Datacenter
 	wp.Handler = j.handle
 
