@@ -51,6 +51,8 @@ func (j *KvSource) SetHttpClient(httpClient *http.Client) {
 
 func (j *KvSource) Watch() error {
 
+	fmt.Println("Running consul kv watcher")
+
 	wp, err := watch.Parse(map[string]interface{}{"type": "keyprefix", "prefix": j.Prefix})
 	if err != nil {
 		return err
@@ -72,6 +74,8 @@ func (j *KvSource) Watch() error {
 	}
 
 	go wp.Run(j.Address)
+
+	fmt.Println("Exiting..")
 
 
 	return nil
