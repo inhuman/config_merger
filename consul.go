@@ -7,7 +7,6 @@ import (
 	"github.com/hashicorp/consul/watch"
 	"time"
 	"fmt"
-	"reflect"
 )
 
 type KvSource struct {
@@ -64,7 +63,7 @@ func (j *KvSource) Watch() error {
 		return err
 	}
 
-	fmt.Println(reflect.TypeOf(j.TargetStruct))
+
 	fmt.Printf("%+v\n", j.TargetStruct)
 
 	wp.Datacenter = j.Datacenter
@@ -92,9 +91,8 @@ func (j *KvSource) handle(u uint64, i interface{}) {
 
 	j.Load()
 
-	fmt.Println(reflect.TypeOf(j.TargetStruct))
+	j.WatchHandler("")
 
-	fmt.Printf("%+v\n", j.TargetStruct)
 
 }
 
