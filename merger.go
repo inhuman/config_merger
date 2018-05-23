@@ -24,6 +24,9 @@ func (m *Merger) AddTargetConfigStruct(s interface{}) {
 }
 
 func (m *Merger) AddSource(src Source) {
+
+	src.SetTargetStruct(m.TargetConfigStruct)
+
 	m.Sources = append(m.Sources, src)
 }
 
@@ -32,9 +35,6 @@ func (m *Merger) MergeConfigs() error {
 	var errAll *multierror.Error
 
 	for _, s := range m.Sources {
-
-		s.SetTargetStruct(m.TargetConfigStruct)
-
 		err := s.Load()
 		if err != nil {
 			errAll = multierror.Append(errAll, err)
