@@ -6,6 +6,7 @@ import (
 	"net/http"
 	"github.com/hashicorp/consul/watch"
 	"fmt"
+	"time"
 )
 
 type KvSource struct {
@@ -67,6 +68,7 @@ func (j *KvSource) Watch() error {
 
 	for {
 		go wp.Run(j.Address)
+		time.Sleep(time.Second)
 	}
 
 
