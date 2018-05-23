@@ -61,6 +61,9 @@ func (j *KvSource) Watch() error {
 	wp.Datacenter = j.Datacenter
 
 	wp.Handler = func(u uint64, i interface{}) {
+
+		fmt.Println("Watch plan handler")
+
 		if i == nil {
 			return
 		}
@@ -72,6 +75,8 @@ func (j *KvSource) Watch() error {
 
 		fmt.Printf("%v", kvs)
 	}
+
+	fmt.Printf("%+v\n", wp)
 
 	go wp.Run(j.Address)
 
