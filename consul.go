@@ -7,6 +7,7 @@ import (
 	"github.com/hashicorp/consul/watch"
 	"time"
 	"fmt"
+	"reflect"
 )
 
 type KvSource struct {
@@ -71,21 +72,6 @@ func (j *KvSource) Watch() error {
 		time.Sleep(time.Second)
 	}
 
-	//resultCh := make(chan api.KVPairs, 1)
-
-	//go func() {
-	//	for {
-	//		select {
-	//			case m := <-resultCh:
-	//
-	//				fmt.Println()
-	//
-	//				for k, v := range m {
-	//					fmt.Printf("key: %v, value: %s", k, v.Value)
-	//				}
-	//		}
-	//	}
-	//}()
 
 	return nil
 }
@@ -102,16 +88,10 @@ func (j *KvSource) handle(u uint64, i interface{}) {
 	}
 
 	j.Load()
+
+	fmt.Println(reflect.TypeOf(j.TargetStruct))
+
 	fmt.Printf("%+v\n", j.TargetStruct)
 
 }
 
-//func (j *KvSource) wrapper(h func(u uint64, i interface{})) func(u uint64, i interface{}) {
-//
-//	fmt.Println("Wrapper reload the config")
-//
-//	j.Load()
-//	j.WatchHandler(j.TargetStruct)
-//
-//	return h
-//}
