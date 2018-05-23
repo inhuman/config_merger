@@ -102,7 +102,7 @@ func (j *KvSource) handle(u uint64, i interface{}) {
 	}
 
 	j.Load()
-	fmt.Printf("%+v\n", i)
+	fmt.Printf("%+v\n", j.TargetStruct)
 
 }
 
