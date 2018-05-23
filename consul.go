@@ -64,7 +64,7 @@ func (j *KvSource) Watch()  {
 
 	if j.WatchHandler != nil {
 
-		fmt.Println("Conditions success")
+
 
 		wp, err := watch.Parse(map[string]interface{}{"type": "keyprefix", "prefix": j.Prefix})
 		if err != nil {
@@ -83,6 +83,8 @@ func (j *KvSource) Watch()  {
 
 func (j *KvSource) handle(u uint64, i interface{}) {
 
+	fmt.Println("Handle hand")
+
 	if i == nil {
 		return
 	}
@@ -94,6 +96,7 @@ func (j *KvSource) handle(u uint64, i interface{}) {
 
 	err := j.Load()
 	if err == nil {
+		fmt.Println("external handler")
 		j.WatchHandler()
 	} else {
 		fmt.Println(err)
