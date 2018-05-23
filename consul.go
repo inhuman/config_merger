@@ -5,8 +5,8 @@ import (
 	"encoding/json"
 	"net/http"
 	"github.com/hashicorp/consul/watch"
-	"fmt"
 	"time"
+	"fmt"
 )
 
 type KvSource struct {
@@ -74,24 +74,27 @@ func (j *KvSource) Watch() error {
 	return nil
 }
 
-func handle(u uint64, i interface{}) {
+func handle(u uint64, i interface{} ) {
 
 	if i == nil {
 		return
 	}
 
-	kvs, ok := i.(api.KVPairs)
+	_, ok := i.(api.KVPairs)
 	if !ok {
 		return
 	}
 
-	for k, v := range kvs {
-		fmt.Printf("key: %v, value: %s", k, v.Value)
-	}
+	//for k, v := range kvs {
+	//	fmt.Printf("key: %v, value: %s", k, v.Value)
+	//}
 }
 
 func (j *KvSource) wrapper(h func(u uint64, i interface{})) func(u uint64, i interface{}) {
 
+	fmt.Println("Wrapper reload the config")
+
+	j.Load()
 	j.WatchHandler(j.TargetStruct)
 
 	return h
