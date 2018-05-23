@@ -63,3 +63,5 @@ func (j *VaultSource) SetTargetStruct(s interface{}) {
 func (j *VaultSource) SetHttpClient(httpClient *http.Client) {
 	j.HttpClient = httpClient
 }
+
+func (j *VaultSource) Watch() {}

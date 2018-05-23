@@ -14,7 +14,7 @@ type Cnf struct {
 }
 
 func TestMerger_AddSource(t *testing.T) {
-	merger := NewMerger()
+	merger := NewMerger(&Cnf{})
 
 	fh := createFileForTest(t, `{"message": "from json"}`)
 	path := fh.Name()
@@ -32,25 +32,24 @@ func TestMerger_AddSource(t *testing.T) {
 }
 
 func TestMerger_AddTargetConfigStruct(t *testing.T) {
-	merger := NewMerger()
-	merger.AddTargetConfigStruct(Cnf{})
-	assert.Equal(t, Cnf{}, merger.TargetConfigStruct)
+	merger := NewMerger(&Cnf{})
+	assert.Equal(t, &Cnf{}, merger.TargetConfigStruct)
 }
 
 func TestMerger_GetFinalConfig(t *testing.T) {
-	merger := NewMerger()
-	merger.AddTargetConfigStruct(Cnf{})
+	merger := NewMerger(&Cnf{})
 	assert.Equal(t, map[string]interface{}{"Message": ""}, merger.GetFinalConfig())
 }
 
 func TestNewMerger(t *testing.T) {
-	merger := NewMerger()
-	assert.Equal(t, &Merger{}, merger)
+	merger := NewMerger(&Cnf{})
+
+	assert.Equal(t, &Merger{TargetConfigStruct: &Cnf{}}, merger)
 }
 
 func TestMerger_MergeConfigs(t *testing.T) {
-
-	merger := NewMerger()
+	cnf := &Cnf{}
+	merger := NewMerger(cnf)
 
 	fh1 := createFileForTest(t, `{"message": "from json"}`)
 	path1 := fh1.Name()
@@ -68,9 +67,7 @@ func TestMerger_MergeConfigs(t *testing.T) {
 	}()
 	merger.AddSource(&JsonSource{Path: path2})
 
-	cnf := &Cnf{}
 
-	merger.AddTargetConfigStruct(cnf)
 	merger.MergeConfigs()
 
 	assert.Equal(t, map[string]interface{}{"Message": "from json 2"}, merger.GetFinalConfig())

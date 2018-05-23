@@ -56,22 +56,22 @@ func (j *KvSource) SetHttpClient(httpClient *http.Client) {
 	j.HttpClient = httpClient
 }
 
-func (j *KvSource) Watch() error {
+func (j *KvSource) Watch()  {
 
-	wp, err := watch.Parse(map[string]interface{}{"type": "keyprefix", "prefix": j.Prefix})
-	if err != nil {
-		return err
+	if j.WatchHandler != nil {
+		wp, err := watch.Parse(map[string]interface{}{"type": "keyprefix", "prefix": j.Prefix})
+		if err != nil {
+			return
+		}
+
+		wp.Datacenter = j.Datacenter
+		wp.Handler = j.handle
+
+		for {
+			wp.Run(j.Address)
+			time.Sleep(time.Second)
+		}
 	}
-
-	wp.Datacenter = j.Datacenter
-	wp.Handler = j.handle
-
-	for {
-		wp.Run(j.Address)
-		time.Sleep(time.Second)
-	}
-
-	return nil
 }
 
 func (j *KvSource) handle(u uint64, i interface{}) {

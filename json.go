@@ -29,3 +29,5 @@ func (j *JsonSource) Load() error {
 func (j *JsonSource) SetTargetStruct(i interface{}) {
 	j.TargetStruct = i
 }
+
+func (j *JsonSource) Watch() {}
