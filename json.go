@@ -6,10 +6,11 @@ import (
 )
 
 type JsonSource struct {
-	Path string
+	Path         string
+	TargetStruct interface{}
 }
 
-func (j *JsonSource) Load(s interface{}) error {
+func (j *JsonSource) Load() error {
 
 	file, err := ioutil.ReadFile(j.Path)
 
@@ -17,10 +18,14 @@ func (j *JsonSource) Load(s interface{}) error {
 		return err
 	}
 
-	err = json.Unmarshal([]byte(file), s)
+	err = json.Unmarshal([]byte(file), j.TargetStruct)
 	if err != nil {
 		return err
 	}
 
 	return nil
+}
+
+func (j *JsonSource) SetTargetStruct(i interface{}) {
+	j.TargetStruct = i
 }

@@ -38,8 +38,10 @@ func TestVaultSource_LoadSuccess(t *testing.T) {
 	gock.InterceptClient(client)
 
 	vaultSource.SetHttpClient(client)
+	vaultSource.SetTargetStruct(cnf)
 
-	err := vaultSource.Load(cnf)
+
+	err := vaultSource.Load()
 	assert.NoError(t, err)
 	assert.Equal(t, "from vault", cnf.Message)
 }
@@ -57,7 +59,7 @@ func TestVaultSource_LoadWrongAddr(t *testing.T) {
 	gock.InterceptClient(client)
 
 	vaultSource.SetHttpClient(client)
-
-	err := vaultSource.Load(cnf)
+	vaultSource.SetTargetStruct(cnf)
+	err := vaultSource.Load()
 	assert.Error(t, err)
 }

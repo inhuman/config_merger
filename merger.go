@@ -11,12 +11,12 @@ type Merger struct {
 }
 
 type Source interface {
-	Load(s interface{}) error
+	Load() error
+	SetTargetStruct(s interface{})
 }
 
 func NewMerger() *Merger {
 	return &Merger{}
-
 }
 
 func (m *Merger) AddTargetConfigStruct(s interface{}) {
@@ -32,7 +32,10 @@ func (m *Merger) MergeConfigs() error {
 	var errAll *multierror.Error
 
 	for _, s := range m.Sources {
-		err := s.Load(m.TargetConfigStruct)
+
+		s.SetTargetStruct(m.TargetConfigStruct)
+
+		err := s.Load()
 		if err != nil {
 			errAll = multierror.Append(errAll, err)
 		}
@@ -49,7 +52,6 @@ func (m *Merger) MergeConfigs() error {
 func (m *Merger) GetFinalConfig() map[string]interface{} {
 	return structs.Map(m.TargetConfigStruct)
 }
-
 
 //TODO: add kv watcher
 //TODO: add json watcher

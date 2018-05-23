@@ -10,13 +10,15 @@ import (
 )
 
 type KvSource struct {
-	Address    string
-	Datacenter string
-	Prefix     string // like this "prefix" (without the /)
-	HttpClient *http.Client
+	Address      string
+	Datacenter   string
+	Prefix       string // like this "prefix" (without the /)
+	HttpClient   *http.Client
+	WatchHandler func(i interface{})
+	TargetStruct interface{}
 }
 
-func (j *KvSource) Load(s interface{}) error {
+func (j *KvSource) Load() error {
 
 	cnf := api.DefaultConfig()
 	cnf.Address = j.Address
@@ -38,12 +40,16 @@ func (j *KvSource) Load(s interface{}) error {
 		return err
 	}
 
-	err = json.Unmarshal([]byte(kvPair.Value), s)
+	err = json.Unmarshal([]byte(kvPair.Value), j.TargetStruct)
 	if err != nil {
 		return err
 	}
 
 	return nil
+}
+
+func (j *KvSource) SetTargetStruct(s interface{}) {
+	j.TargetStruct = s
 }
 
 func (j *KvSource) SetHttpClient(httpClient *http.Client) {
@@ -58,7 +64,7 @@ func (j *KvSource) Watch() error {
 	}
 
 	wp.Datacenter = j.Datacenter
-	wp.Handler = handle
+	wp.Handler = j.wrapper(handle)
 
 	for {
 		wp.Run(j.Address)
@@ -82,4 +88,11 @@ func handle(u uint64, i interface{}) {
 	for k, v := range kvs {
 		fmt.Printf("key: %v, value: %s", k, v.Value)
 	}
+}
+
+func (j *KvSource) wrapper(h func(u uint64, i interface{})) func(u uint64, i interface{}) {
+
+	j.WatchHandler(j.TargetStruct)
+
+	return h
 }

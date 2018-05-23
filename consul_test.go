@@ -37,7 +37,8 @@ func TestKvSource_LoadSuccess(t *testing.T) {
 	kvSource.SetHttpClient(client)
 
 	cnf := &Cnf{}
-	err := kvSource.Load(cnf)
+	kvSource.SetTargetStruct(cnf)
+	err := kvSource.Load()
 
 	assert.NoError(t, err)
 	assert.Equal(t, "from kv", cnf.Message)
@@ -57,7 +58,9 @@ func TestKvSource_LoadWrongAddr(t *testing.T) {
 	kvSource.SetHttpClient(client)
 
 	cnf := &Cnf{}
-	err := kvSource.Load(cnf)
+
+	kvSource.SetTargetStruct(cnf)
+
+	err := kvSource.Load()
 	assert.Error(t, err)
 }
-

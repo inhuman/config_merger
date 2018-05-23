@@ -7,13 +7,14 @@ import (
 )
 
 type VaultSource struct {
-	Address    string
-	Token      string
-	Prefix     string
-	HttpClient *http.Client
+	Address      string
+	Token        string
+	Prefix       string
+	HttpClient   *http.Client
+	TargetStruct interface{}
 }
 
-func (j *VaultSource) Load(s interface{}) error {
+func (j *VaultSource) Load() error {
 
 	config := api.DefaultConfig()
 
@@ -46,13 +47,17 @@ func (j *VaultSource) Load(s interface{}) error {
 			return err
 		}
 
-		err = json.Unmarshal(b, s)
+		err = json.Unmarshal(b, j.TargetStruct)
 		if err != nil {
 			return err
 		}
 	}
 
 	return nil
+}
+
+func (j *VaultSource) SetTargetStruct(s interface{}) {
+	j.TargetStruct = s
 }
 
 func (j *VaultSource) SetHttpClient(httpClient *http.Client) {

@@ -18,8 +18,9 @@ func TestJsonSource_LoadSuccess(t *testing.T) {
 	jsonSource := &JsonSource{Path: path}
 
 	cnf := &Cnf{}
+	jsonSource.SetTargetStruct(cnf)
 
-	err := jsonSource.Load(cnf)
+	err := jsonSource.Load()
 	assert.NoError(t, err)
 
 	assert.Equal(t, &Cnf{Message: "from json"}, cnf)
@@ -37,7 +38,7 @@ func TestJsonSource_LoadWrongJson(t *testing.T) {
 
 	jsonSource := &JsonSource{Path: path}
 	cnf := &Cnf{}
-
-	err := jsonSource.Load(cnf)
+	jsonSource.SetTargetStruct(cnf)
+	err := jsonSource.Load()
 	assert.Error(t, err)
 }
