@@ -10,7 +10,7 @@ import (
 )
 
 type KvSource struct {
-	Address    string //
+	Address    string
 	Datacenter string
 	Prefix     string // like this "prefix" (without the /)
 	HttpClient *http.Client
@@ -61,7 +61,7 @@ func (j *KvSource) Watch() error {
 	wp.Handler = handle
 
 	for {
-		go wp.Run(j.Address)
+		wp.Run(j.Address)
 		time.Sleep(time.Second)
 	}
 
@@ -69,8 +69,6 @@ func (j *KvSource) Watch() error {
 }
 
 func handle(u uint64, i interface{}) {
-
-	fmt.Println("Watch plan handler")
 
 	if i == nil {
 		return
