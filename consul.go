@@ -80,14 +80,14 @@ func handle(u uint64, i interface{} ) {
 		return
 	}
 
-	_, ok := i.(api.KVPairs)
+	kvs, ok := i.(api.KVPairs)
 	if !ok {
 		return
 	}
 
-	//for k, v := range kvs {
-	//	fmt.Printf("key: %v, value: %s", k, v.Value)
-	//}
+	for k, v := range kvs {
+		fmt.Printf("key: %v, value: %s", k, v.Value)
+	}
 }
 
 func (j *KvSource) wrapper(h func(u uint64, i interface{})) func(u uint64, i interface{}) {
