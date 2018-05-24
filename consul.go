@@ -79,6 +79,7 @@ func (j *KvSource) Watch() {
 			err := wp.Run(j.Address)
 			fmt.Println("err:", err)
 			time.Sleep(time.Second)
+			fmt.Println("after run")
 		}
 	}
 }
