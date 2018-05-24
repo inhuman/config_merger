@@ -56,7 +56,7 @@ func (j *KvSource) SetHttpClient(httpClient *http.Client) {
 	j.HttpClient = httpClient
 }
 
-func (j *KvSource) Watch()  {
+func (j *KvSource) Watch() {
 
 	fmt.Println("Run kv watcher")
 
@@ -76,12 +76,8 @@ func (j *KvSource) Watch()  {
 
 		for {
 			fmt.Println("wp.Run", j.Address)
-
 			err := wp.Run(j.Address)
-			if err != nil {
-				fmt.Println(err)
-			}
-
+			fmt.Println("err:", err)
 			time.Sleep(time.Second)
 		}
 	}
@@ -110,4 +106,3 @@ func (j *KvSource) handle(u uint64, i interface{}) {
 		fmt.Println(err)
 	}
 }
-
