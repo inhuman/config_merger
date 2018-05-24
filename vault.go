@@ -64,4 +64,4 @@ func (j *VaultSource) SetHttpClient(httpClient *http.Client) {
 	j.HttpClient = httpClient
 }
 
-func (j *VaultSource) Watch() {}
+func (j *VaultSource) Watch(done chan bool) {}

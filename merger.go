@@ -13,7 +13,7 @@ type Merger struct {
 type Source interface {
 	Load() error
 	SetTargetStruct(s interface{})
-	Watch()
+	Watch(done chan bool)
 }
 
 func NewMerger(s interface{}) *Merger {
@@ -36,7 +36,9 @@ func (m *Merger) MergeConfigs() error {
 		if err != nil {
 			errAll = multierror.Append(errAll, err)
 		}
-		s.Watch()
+		done := make(chan bool)
+
+		s.Watch(done)
 	}
 
 	if errAll != nil {
