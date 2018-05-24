@@ -71,7 +71,6 @@ func (m *Merger) Run() error {
 	return nil
 }
 
-
 func (m *Merger) GetFinalConfig() map[string]interface{} {
 	return structs.Map(m.TargetConfigStruct)
 }
