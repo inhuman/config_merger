@@ -60,11 +60,11 @@ func (j *KvSource) Watch()  {
 
 	fmt.Println("Run kv watcher")
 
-	fmt.Printf("%p", j.WatchHandler)
+	fmt.Printf("%p\n", j.WatchHandler)
 
 	if j.WatchHandler != nil {
 
-		fmt.Print("WatchHandler != nil")
+		fmt.Println("WatchHandler != nil")
 
 		wp, err := watch.Parse(map[string]interface{}{"type": "keyprefix", "prefix": j.Prefix})
 		if err != nil {
@@ -75,6 +75,8 @@ func (j *KvSource) Watch()  {
 		wp.Handler = j.handle
 
 		for {
+			fmt.Println("wp.Run ", j.Address)
+
 			wp.Run(j.Address)
 			time.Sleep(time.Second)
 		}
