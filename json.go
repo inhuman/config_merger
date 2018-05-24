@@ -30,4 +30,4 @@ func (j *JsonSource) SetTargetStruct(i interface{}) {
 	j.TargetStruct = i
 }
 
-func (j *JsonSource) Watch(done chan bool) {}
+func (j *JsonSource) Watch() {}

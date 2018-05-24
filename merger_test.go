@@ -68,7 +68,7 @@ func TestMerger_MergeConfigs(t *testing.T) {
 	merger.AddSource(&JsonSource{Path: path2})
 
 
-	merger.MergeConfigs()
+	merger.Run()
 
 	assert.Equal(t, map[string]interface{}{"Message": "from json 2"}, merger.GetFinalConfig())
 }
