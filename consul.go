@@ -74,12 +74,6 @@ func (j *KvSource) Watch(done chan bool) {
 				fmt.Println(err)
 			}
 			time.Sleep(time.Second)
-
-			select {
-			case <-done:
-				return
-			default:
-			}
 		}
 	}
 }

@@ -31,6 +31,7 @@ func (m *Merger) MergeConfigs() error {
 
 	var errAll *multierror.Error
 
+	done := make(chan bool)
 	for _, s := range m.Sources {
 		err := s.Load()
 		if err != nil {
@@ -46,6 +47,7 @@ func (m *Merger) MergeConfigs() error {
 			return errAll
 		}
 	}
+	<-done
 	return nil
 }
 
