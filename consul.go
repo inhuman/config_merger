@@ -75,9 +75,13 @@ func (j *KvSource) Watch()  {
 		wp.Handler = j.handle
 
 		for {
-			fmt.Println("wp.Run ", j.Address)
+			fmt.Println("wp.Run", j.Address)
 
-			wp.Run(j.Address)
+			err := wp.Run(j.Address)
+			if err != nil {
+				fmt.Println(err)
+			}
+
 			time.Sleep(time.Second)
 		}
 	}
