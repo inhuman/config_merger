@@ -47,7 +47,7 @@ func TestNewMerger(t *testing.T) {
 	assert.Equal(t, &Merger{TargetConfigStruct: &Cnf{}}, merger)
 }
 
-func TestMerger_MergeConfigs(t *testing.T) {
+func TestMerger_Run(t *testing.T) {
 	cnf := &Cnf{}
 	merger := NewMerger(cnf)
 
@@ -72,9 +72,6 @@ func TestMerger_MergeConfigs(t *testing.T) {
 
 	assert.Equal(t, map[string]interface{}{"Message": "from json 2"}, merger.GetFinalConfig())
 }
-
-
-
 
 func createFileForTest(t *testing.T, s string) *os.File {
 	data := []byte(s)
