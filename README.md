@@ -131,12 +131,6 @@ func main()  {
 	merger.AddSource(vaultSource)
 
 	merger.RunWatch()
-
-	// There is two ways to get final config
-
-	fmt.Printf("%s", merger.GetFinalConfig()) // return map[string]interface{}
-
-	fmt.Printf("%+v", strct) // return struct
 }
 
 func watcher(confStruct *Config) {
