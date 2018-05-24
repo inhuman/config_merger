@@ -36,7 +36,7 @@ func (m *Merger) MergeConfigs() error {
 		if err != nil {
 			errAll = multierror.Append(errAll, err)
 		}
-		go s.Watch()
+		s.Watch()
 	}
 
 	if errAll != nil {

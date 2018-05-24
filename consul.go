@@ -58,15 +58,9 @@ func (j *KvSource) SetHttpClient(httpClient *http.Client) {
 
 func (j *KvSource) Watch() {
 
-	fmt.Println("Run kv watcher")
-
-	fmt.Printf("%p\n", j.WatchHandler)
-
 	if j.WatchHandler != nil {
-
-		fmt.Println("WatchHandler != nil")
-
 		wp, err := watch.Parse(map[string]interface{}{"type": "keyprefix", "prefix": j.Prefix})
+
 		if err != nil {
 			return
 		}
@@ -84,11 +78,7 @@ func (j *KvSource) Watch() {
 	}
 }
 
-//TODO: fix watcher for mass watch
-
 func (j *KvSource) handle(u uint64, i interface{}) {
-
-	fmt.Println("Handle hand")
 
 	if i == nil {
 		return
@@ -101,7 +91,6 @@ func (j *KvSource) handle(u uint64, i interface{}) {
 
 	err := j.Load()
 	if err == nil {
-		fmt.Println("external handler")
 		j.WatchHandler()
 	} else {
 		fmt.Println(err)
