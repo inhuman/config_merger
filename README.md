@@ -4,18 +4,19 @@
 Config tool for merge configs from different sources. Nested configs not supports
 
 Now supports:
-- json file
-- consul kv
-- vault
-
+- json file (simple)
+- consul kv (simple, watch)
+- vault (simple)
 
 
 ### Usage
-
+##### Simple Mode
 ```golang
-package configMerger
+package main
 
-import "fmt"
+import ("fmt"
+	"github.com/inhuman/configMerger"
+)
 
 type Config struct {
 	Message    string  `json:"message"`
@@ -29,20 +30,19 @@ type Config struct {
 func main()  {
 
 	// create config struct
-	strct := &Cnf{}
+	strct := &Config{}
 
-	merger := NewMerger()
-
-	merger.AddTargetConfigStruct(strct)
+	merger := configMerger.NewMerger(strct)
 
 	// add json source
-	jsonSource := &JsonSource{
+	jsonSource := &configMerger.JsonSource{
 		Path: "/path/to/json",
 	}
 	merger.AddSource(jsonSource)
 
+
 	// add consul kv source
-	consulKvSource := &KvSource{
+	consulKvSource := &configMerger.KvSource{
 		Address: "consul.addr:8500",
 		Prefix: "conf_merger/json",
 		Datacenter: "experiments",
@@ -51,20 +51,102 @@ func main()  {
 
 
 	// add vault source
-	vaultSource := &VaultSource{
+	vaultSource := &configMerger.VaultSource{
 		Address: "http://vault.addr:8200",
 		Prefix: "secret/test/config_merger",
 		Token: "vault_token",
 	}
 	merger.AddSource(vaultSource)
 
-	merger.MergeConfigs()
+	merger.Run()
 
-    // There is two ways to get final config
+	// There is two ways to get final config
 
-    fmt.Printf("%s", merger.GetFinalConfig()) // return map[string]interface{}
+	fmt.Printf("%s", merger.GetFinalConfig()) // return map[string]interface{}
 
-    fmt.Printf("%s", cnf) // return struct
+	fmt.Printf("%+v", strct) // return struct
 }
 ```
 
+##### Watch Mode
+```golang
+package main
+
+import ("fmt"
+	"github.com/inhuman/configMerger"
+)
+
+type Config struct {
+	Message    string  `json:"message"`
+	IntValue   int     `json:"int_value"`
+	FloatValue float32 `json:"float_value"`
+	Login      string  `json:"login"`
+	Password   string  `json:"password"`
+}
+
+// Override priority depends order of adding - last overrides previous
+func main()  {
+
+	// create config struct
+	strct := &Config{}
+
+	merger := configMerger.NewMerger(strct)
+
+	// add json source
+	jsonSource := &configMerger.JsonSource{
+		Path: "/path/to/json",
+	}
+	merger.AddSource(jsonSource)
+
+	// add consul kv source
+	consulKvSource := &configMerger.KvSource{
+		Address: "consul.addr:8500",
+		Prefix: "conf_merger/json",
+		Datacenter: "experiments",
+		WatchHandler: func() {
+            fmt.Println("watcher 2")
+            watcher(confStruct)
+        },
+	}
+	merger.AddSource(consulKvSource)
+
+    // add consul kv source 2
+    kvSource2 := &configMerger.KvSource{
+		Address: "consul.addr:8500",
+		Prefix: "conf_merger/another_path",
+		Datacenter: "experiments",
+		WatchHandler: func() {
+			fmt.Println("watcher 2")
+			watcher(confStruct)
+		},
+	}
+	m.AddSource(kvSource2)
+
+	// add vault source
+	vaultSource := &configMerger.VaultSource{
+		Address: "http://vault.addr:8200",
+		Prefix: "secret/test/config_merger",
+		Token: "vault_token",
+	}
+	merger.AddSource(vaultSource)
+
+	merger.RunWatch()
+
+	// There is two ways to get final config
+
+	fmt.Printf("%s", merger.GetFinalConfig()) // return map[string]interface{}
+
+	fmt.Printf("%+v", strct) // return struct
+}
+
+func watcher(confStruct *Config) {
+
+	fmt.Printf("Message: %s\n", confStruct.Message)
+	fmt.Printf("IntValue: %v\n", confStruct.IntValue)
+	fmt.Printf("FloatValue: %v\n", confStruct.FloatValue)
+	fmt.Printf("Login: %s\n", confStruct.Login)
+	fmt.Printf("Password: %s\n", confStruct.Password)
+	fmt.Println()
+}
+
+```
