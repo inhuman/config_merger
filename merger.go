@@ -38,7 +38,7 @@ func (m *Merger) MergeConfigs() error {
 		}
 		done := make(chan bool)
 
-		s.Watch(done)
+		go s.Watch(done)
 	}
 
 	if errAll != nil {
