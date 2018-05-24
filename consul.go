@@ -64,7 +64,7 @@ func (j *KvSource) Watch()  {
 
 	if j.WatchHandler != nil {
 
-
+		fmt.Print("WatchHandler != nil")
 
 		wp, err := watch.Parse(map[string]interface{}{"type": "keyprefix", "prefix": j.Prefix})
 		if err != nil {
@@ -80,6 +80,8 @@ func (j *KvSource) Watch()  {
 		}
 	}
 }
+
+//TODO: fix watcher for mass watch
 
 func (j *KvSource) handle(u uint64, i interface{}) {
 
