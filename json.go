@@ -46,6 +46,8 @@ func (j *JsonSource) Watch() {
 		//
 		done := make(chan bool)
 
+		//TODO: make it work
+
 		//
 		go func() {
 			for {
