@@ -3,8 +3,10 @@ package configMerger
 import (
 	"io/ioutil"
 	"encoding/json"
-	"github.com/fsnotify/fsnotify"
 	"fmt"
+	"github.com/radovskyb/watcher"
+	"log"
+	"time"
 )
 
 type JsonSource struct {
@@ -36,39 +38,35 @@ func (j *JsonSource) SetTargetStruct(i interface{}) {
 func (j *JsonSource) Watch() {
 
 	if j.WatchHandler != nil {
-		// creates a new file watcher
-		watcher, err := fsnotify.NewWatcher()
-		if err != nil {
-			fmt.Println("ERROR", err)
-		}
-		defer watcher.Close()
+		w := watcher.New()
+		w.SetMaxEvents(1)
 
-		//
-		done := make(chan bool)
+		w.FilterOps(watcher.Write)
 
-		//TODO: make it work
-
-		//
 		go func() {
 			for {
 				select {
-				// watch for events
-				case event := <-watcher.Events:
-					fmt.Printf("EVENT! %#v\n", event)
-
-					// watch for errors
-				case err := <-watcher.Errors:
-					fmt.Println("ERROR", err)
+				case event := <-w.Event:
+					fmt.Println(event)
+				case err := <-w.Error:
+					log.Fatalln(err)
+				case <-w.Closed:
+					return
 				}
 			}
 		}()
 
-		// out of the box fsnotify can watch a single file, or a single directory
-		if err := watcher.Add(j.Path); err != nil {
-			fmt.Println("ERROR", err)
+		if err := w.Add(j.Path); err != nil {
+			fmt.Println(err)
 		}
 
-		<-done
+		go w.Wait()
+
+
+		// Start the watching process - it'll check for changes every 100ms.
+		if err := w.Start(time.Second); err != nil {
+			fmt.Println(err)
+		}
 	}
 
 }
