@@ -49,6 +49,8 @@ func (j *JsonSource) Watch() {
 					err := j.Load()
 					if err == nil {
 						j.WatchHandler()
+					} else {
+						fmt.Println(err)
 					}
 				case err := <-w.Error:
 					fmt.Println(err)
@@ -64,8 +66,6 @@ func (j *JsonSource) Watch() {
 
 		go w.Wait()
 
-
-		// Start the watching process - it'll check for changes every 100ms.
 		if err := w.Start(time.Second); err != nil {
 			fmt.Println(err)
 		}
