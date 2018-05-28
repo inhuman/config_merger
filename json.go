@@ -5,7 +5,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/radovskyb/watcher"
-	"log"
 	"time"
 )
 
@@ -46,10 +45,10 @@ func (j *JsonSource) Watch() {
 		go func() {
 			for {
 				select {
-				case event := <-w.Event:
-					fmt.Println(event)
+				case <-w.Event:
+					j.WatchHandler()
 				case err := <-w.Error:
-					log.Fatalln(err)
+					fmt.Println(err)
 				case <-w.Closed:
 					return
 				}
