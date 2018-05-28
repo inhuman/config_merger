@@ -14,7 +14,8 @@ Now supports:
 ```golang
 package main
 
-import ("fmt"
+import (
+    "fmt"
 	"github.com/inhuman/configMerger"
 )
 
@@ -72,7 +73,8 @@ func main()  {
 ```golang
 package main
 
-import ("fmt"
+import (
+    "fmt"
 	"github.com/inhuman/configMerger"
 )
 
@@ -95,6 +97,10 @@ func main()  {
 	// add json source
 	jsonSource := &configMerger.JsonSource{
 		Path: "/path/to/json",
+		WatchHandler: func() {
+            fmt.Println("json watcher")
+            watcher(confStruct)
+        },
 	}
 	merger.AddSource(jsonSource)
 

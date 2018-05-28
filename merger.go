@@ -37,7 +37,6 @@ func (m *Merger) RunWatch() error {
 		if err != nil {
 			errAll = multierror.Append(errAll, err)
 		}
-
 		go s.Watch()
 	}
 
@@ -59,7 +58,6 @@ func (m *Merger) Run() error {
 		if err != nil {
 			errAll = multierror.Append(errAll, err)
 		}
-
 	}
 
 	if errAll != nil {
