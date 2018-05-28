@@ -46,7 +46,10 @@ func (j *JsonSource) Watch() {
 			for {
 				select {
 				case <-w.Event:
-					j.WatchHandler()
+					err := j.Load()
+					if err == nil {
+						j.WatchHandler()
+					}
 				case err := <-w.Error:
 					fmt.Println(err)
 				case <-w.Closed:
