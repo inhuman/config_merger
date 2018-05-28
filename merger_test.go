@@ -1,4 +1,4 @@
-package configMerger
+package config_merger
 
 import (
 	"testing"
