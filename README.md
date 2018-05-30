@@ -1,5 +1,5 @@
 # Config merger
-[![Build Status](https://travis-ci.org/inhuman/configMerger.svg?branch=master)](https://travis-ci.org/inhuman/configMerger)
+[![Build Status](https://travis-ci.org/inhuman/config_merger.svg?branch=master)](https://travis-ci.org/inhuman/config_merger)
 
 Config tool for merge configs from different sources. Nested configs not supports
 
