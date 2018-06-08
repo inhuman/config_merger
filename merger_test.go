@@ -73,6 +73,21 @@ func TestMerger_Run(t *testing.T) {
 	assert.Equal(t, map[string]interface{}{"Message": "from json 2"}, merger.GetFinalConfig())
 }
 
+func TestMerger_WrongType(t *testing.T) {
+	cnf := Cnf{}
+	var panicMessage = "must provide pointer to struct, received [config_merger.Cnf]"
+
+	defer func() {
+		if r := recover(); r != nil {
+			if r != panicMessage{
+				t.Error("Panic message expected '" + panicMessage + "', got '" + r.(string) + "'")
+			}
+		}
+	}()
+	NewMerger(cnf)
+	t.Error("The code did not panic")
+}
+
 func createFileForTest(t *testing.T, s string) *os.File {
 	data := []byte(s)
 	path := filepath.Join(os.TempDir(), fmt.Sprintf("file.%d", time.Now().UnixNano()))

@@ -3,6 +3,8 @@ package config_merger
 import (
 	"github.com/fatih/structs"
 	"github.com/hashicorp/go-multierror"
+	"reflect"
+	"fmt"
 )
 
 type Merger struct {
@@ -18,6 +20,11 @@ type Source interface {
 
 func NewMerger(s interface{}) *Merger {
 	m := &Merger{}
+
+	if reflect.ValueOf(s).Kind() != reflect.Ptr {
+		panic(fmt.Sprintf("must provide pointer to struct, received [%T]", s))
+	}
+
 	m.TargetConfigStruct = s
 	return m
 }
