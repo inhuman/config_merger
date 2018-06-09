@@ -1,8 +1,7 @@
 # Config merger
 [![Build Status](https://travis-ci.org/inhuman/config_merger.svg?branch=master)](https://travis-ci.org/inhuman/config_merger)
 
-Config tool for merge configs from different sources. Nested configs not supports
-
+Config tool for merge configs from different sources. 
 Now supports:
 - json file (simple)
 - consul kv (simple, watch)

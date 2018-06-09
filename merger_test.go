@@ -13,6 +13,14 @@ type Cnf struct {
 	Message string `json:"message"`
 }
 
+type NestedConf struct {
+	NestedPassword struct{
+		Pass1 string `json:"pass_1" vault:"pass_1"`
+		Pass2 string `json:"pass_2" vault:"pass_2"`
+	} `json:"nested_password"`
+}
+
+
 func TestMerger_AddSource(t *testing.T) {
 	merger := NewMerger(&Cnf{})
 

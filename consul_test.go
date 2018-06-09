@@ -5,6 +5,7 @@ import (
 	"gopkg.in/h2non/gock.v1"
 	"net/http"
 	"github.com/stretchr/testify/assert"
+	"time"
 )
 
 func TestKvSource_LoadSuccess(t *testing.T) {
@@ -31,7 +32,7 @@ func TestKvSource_LoadSuccess(t *testing.T) {
 		Prefix:     "test/prefix",
 	}
 
-	client := &http.Client{Transport: &http.Transport{}}
+	client := &http.Client{Transport: &http.Transport{}, Timeout: time.Microsecond}
 	gock.InterceptClient(client)
 
 	kvSource.SetHttpClient(client)
@@ -52,7 +53,7 @@ func TestKvSource_LoadWrongAddr(t *testing.T) {
 		Prefix:     "test/prefix",
 	}
 
-	client := &http.Client{Transport: &http.Transport{}}
+	client := &http.Client{Transport: &http.Transport{}, Timeout: time.Microsecond}
 	gock.InterceptClient(client)
 
 	kvSource.SetHttpClient(client)

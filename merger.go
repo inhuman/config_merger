@@ -25,6 +25,11 @@ func NewMerger(s interface{}) *Merger {
 		panic(fmt.Sprintf("must provide pointer to struct, received [%T]", s))
 	}
 
+	err := validateStruct(s)
+	if err != nil {
+		panic(err.Error())
+	}
+
 	m.TargetConfigStruct = s
 	return m
 }

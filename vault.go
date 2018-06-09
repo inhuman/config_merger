@@ -4,6 +4,7 @@ import (
 	"github.com/hashicorp/vault/api"
 	"net/http"
 	"encoding/json"
+	"reflect"
 )
 
 type VaultSource struct {
@@ -51,9 +52,52 @@ func (j *VaultSource) Load() error {
 		if err != nil {
 			return err
 		}
+
+		fillFieldsByTags(j.TargetStruct, b)
 	}
 
 	return nil
+}
+
+func processTags(t reflect.Type, v reflect.Value, b []byte) error {
+
+	for i := 0; i < t.NumField(); i++ {
+		field := t.Field(i)
+		value := v.Field(i)
+
+		if field.Type.Kind() == reflect.Struct {
+			err := processTags(field.Type, value, b)
+			if err != nil {
+				return err
+			}
+			continue
+		}
+
+		column := field.Tag.Get("vault")
+
+		if column != "" {
+			var bm map[string]string
+			bm = make(map[string]string)
+			err := json.Unmarshal(b, &bm)
+			if err != nil {
+				return nil
+			}
+
+			//TODO: add int and float types, just in case
+			value.SetString(bm[column])
+		}
+	}
+
+	return nil
+}
+
+// receive pointer to struct
+func fillFieldsByTags(i interface{}, b []byte) {
+
+	t := reflect.TypeOf(i).Elem()
+	v := reflect.ValueOf(i).Elem()
+
+	processTags(t, v, b)
 }
 
 func (j *VaultSource) SetTargetStruct(s interface{}) {
