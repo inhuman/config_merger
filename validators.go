@@ -44,13 +44,18 @@ func isDuplicateTags(t reflect.Type, tags []string) error {
 
 		column := field.Tag.Get("vault")
 
-		for _, tag := range tags {
-			if tag == column {
-				return errors.New("duplicate vault tags found: " + string(tag))
+		if column != "" {
+			for _, tag := range tags {
+				if tag == column {
+					return errors.New("duplicate vault tags found: " + string(tag))
+				}
 			}
+
+			tags = append(tags, column)
 		}
 
-		tags = append(tags, column)
+
+
 	}
 
 	return nil
