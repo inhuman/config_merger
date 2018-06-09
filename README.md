@@ -24,6 +24,9 @@ type Config struct {
 	FloatValue float32 `json:"float_value"`
 	Login      string  `json:"login"`
 	Password   string  `json:"password"`
+	NestedPassword struct{
+		Pass1 string `json:"pass_1" vault:"pass_1"`
+	} `json:"nested_password"`
 }
 
 // Override priority depends order of adding - last overrides previous
