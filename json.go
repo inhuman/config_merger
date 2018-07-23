@@ -49,6 +49,7 @@ func (j *JsonSource) Watch(done chan bool, group *sync.WaitGroup) {
 				case <-w.Event:
 					err := j.Load()
 					if err == nil {
+						group.Add(1)
 						j.WatchHandler()
 						fmt.Println("Exited from json watcher")
 						group.Done()
@@ -59,11 +60,10 @@ func (j *JsonSource) Watch(done chan bool, group *sync.WaitGroup) {
 					}
 				case err := <-w.Error:
 					fmt.Println(err)
-				//case <-done:
-				//	w.Close()
-				//	fmt.Println("Done received")
-				//	group.Done()
-				//	return
+				case <-done:
+					w.Close()
+					fmt.Println("Done received to json ")
+					return
 				}
 			}
 		}()

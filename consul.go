@@ -72,19 +72,6 @@ func (j *KvSource) Watch(done chan bool, group *sync.WaitGroup) {
 			group.Done()
 		}
 
-		//for {
-		//	select {
-		//	case <-done:
-		//		wp.Stop()
-		//		return
-		//	default:
-		//		err := wp.Run(j.Address)
-		//		if err != nil {
-		//			fmt.Println(err)
-		//		}
-		//		time.Sleep(time.Second)
-		//	}
-		//}
 
 		go func() {
 			err = wp.Run(j.Address)
