@@ -17,7 +17,7 @@ type Merger struct {
 type Source interface {
 	Load() error
 	SetTargetStruct(s interface{})
-	Watch(done chan bool, group sync.WaitGroup)
+	Watch(done chan bool, group *sync.WaitGroup)
 }
 
 func NewMerger(s interface{}) *Merger {
@@ -57,7 +57,7 @@ func (m *Merger) RunWatch() error {
 		}
 
 		wg.Add(1)
-		go s.Watch(m.done, wg)
+		go s.Watch(m.done, &wg)
 	}
 
 	if errAll != nil {

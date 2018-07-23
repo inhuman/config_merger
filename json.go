@@ -35,7 +35,7 @@ func (j *JsonSource) SetTargetStruct(i interface{}) {
 	j.TargetStruct = i
 }
 
-func (j *JsonSource) Watch(done chan bool, group sync.WaitGroup) {
+func (j *JsonSource) Watch(done chan bool, group *sync.WaitGroup) {
 
 	if j.WatchHandler != nil {
 		w := watcher.New()
