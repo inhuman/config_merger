@@ -10,6 +10,7 @@ import (
 type Merger struct {
 	Sources            []Source
 	TargetConfigStruct interface{}
+	Done chan bool
 }
 
 type Source interface {
@@ -19,7 +20,9 @@ type Source interface {
 }
 
 func NewMerger(s interface{}) *Merger {
-	m := &Merger{}
+	m := &Merger{
+		Done: make(chan bool),
+	}
 
 	if reflect.ValueOf(s).Kind() != reflect.Ptr {
 		panic(fmt.Sprintf("must provide pointer to struct, received [%T]", s))
@@ -43,7 +46,6 @@ func (m *Merger) RunWatch() error {
 
 	var errAll *multierror.Error
 
-	done := make(chan bool)
 	for _, s := range m.Sources {
 		err := s.Load()
 		if err != nil {
@@ -57,8 +59,13 @@ func (m *Merger) RunWatch() error {
 			return errAll
 		}
 	}
-	<-done
+	<-m.Done
+
 	return nil
+}
+
+func (m *Merger) StopWatch() {
+	m.Done <- true
 }
 
 func (m *Merger) Run() error {
