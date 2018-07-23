@@ -86,10 +86,14 @@ func (j *KvSource) Watch(done chan bool, group *sync.WaitGroup) {
 		//	}
 		//}
 
-		err = wp.Run(j.Address)
-		if err != nil {
-			fmt.Println(err)
-		}
+		go func() {
+			err = wp.Run(j.Address)
+			if err != nil {
+				fmt.Println(err)
+			}
+		}()
+
+
 
 		fmt.Println("kv watcher started")
 
