@@ -5,7 +5,6 @@ import (
 	"encoding/json"
 	"net/http"
 	"github.com/hashicorp/consul/watch"
-	"time"
 	"fmt"
 	"sync"
 )
@@ -69,18 +68,23 @@ func (j *KvSource) Watch(done chan bool, group *sync.WaitGroup) {
 		wp.Datacenter = j.Datacenter
 		wp.Handler = j.handle
 
-		for {
-			select {
-			case <-done:
-				wp.Stop()
-				return
-			default:
-				err := wp.Run(j.Address)
-				if err != nil {
-					fmt.Println(err)
-				}
-				time.Sleep(time.Second)
-			}
+		//for {
+		//	select {
+		//	case <-done:
+		//		wp.Stop()
+		//		return
+		//	default:
+		//		err := wp.Run(j.Address)
+		//		if err != nil {
+		//			fmt.Println(err)
+		//		}
+		//		time.Sleep(time.Second)
+		//	}
+		//}
+
+		err = wp.Run(j.Address)
+		if err != nil {
+			fmt.Println(err)
 		}
 	}
 }

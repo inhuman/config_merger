@@ -59,10 +59,11 @@ func (j *JsonSource) Watch(done chan bool, group *sync.WaitGroup) {
 					}
 				case err := <-w.Error:
 					fmt.Println(err)
-				case <-done:
-					w.Close()
-					group.Done()
-					return
+				//case <-done:
+				//	w.Close()
+				//	fmt.Println("Done received")
+				//	group.Done()
+				//	return
 				}
 			}
 		}()
