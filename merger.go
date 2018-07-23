@@ -6,18 +6,42 @@ import (
 	"reflect"
 	"fmt"
 	"sync"
+	"time"
 )
 
 type Merger struct {
 	Sources            []Source
 	TargetConfigStruct interface{}
-	done chan bool
+	done               chan bool
+	wg                 CountWg
 }
 
 type Source interface {
 	Load() error
 	SetTargetStruct(s interface{})
-	Watch(done chan bool, group *sync.WaitGroup)
+	Watch(done chan bool, group *CountWg)
+}
+
+type CountWg struct {
+	sync.WaitGroup
+	Count int
+}
+
+func (cg CountWg) Add(delta int) {
+	cg.Count += delta
+	cg.WaitGroup.Add(delta)
+}
+
+// Decrement on Done
+func (cg CountWg) Done() {
+	cg.Count--
+	cg.WaitGroup.Done()
+}
+
+func (cg CountWg) DoneAll() {
+	for i := 0; i <= cg.Count; i++ {
+		cg.Done()
+	}
 }
 
 func NewMerger(s interface{}) *Merger {
@@ -47,7 +71,6 @@ func (m *Merger) RunWatch() error {
 
 	var errAll *multierror.Error
 
-	var wg sync.WaitGroup
 
 	doneMap := make(map[int]chan bool)
 
@@ -57,7 +80,7 @@ func (m *Merger) RunWatch() error {
 			errAll = multierror.Append(errAll, err)
 		}
 		doneMap[i] = make(chan bool)
-		go s.Watch(doneMap[i], &wg)
+		go s.Watch(doneMap[i], &m.wg)
 	}
 
 	if errAll != nil {
@@ -66,18 +89,24 @@ func (m *Merger) RunWatch() error {
 		}
 	}
 
-	<- m.done
+	<-m.done
 
 	for d := range m.Sources {
 		doneMap[d] <- true
 	}
-	wg.Wait()
+	m.wg.Wait()
 
 	return nil
 }
 
-func (m *Merger) StopWatch() {
-	m.done <- true
+func (m *Merger) StopWatch(timeout time.Duration) {
+
+	if timeout == 0 {
+		m.done <- true
+	} else {
+		<- time.After(timeout)
+		m.wg.DoneAll()
+	}
 }
 
 func (m *Merger) Run() error {
