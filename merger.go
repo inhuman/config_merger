@@ -56,10 +56,7 @@ func (m *Merger) RunWatch() error {
 		if err != nil {
 			errAll = multierror.Append(errAll, err)
 		}
-
 		doneMap[i] = make(chan bool)
-		fmt.Println("Done chan created for watcher", i)
-
 		go s.Watch(doneMap[i], &wg)
 	}
 
@@ -70,18 +67,11 @@ func (m *Merger) RunWatch() error {
 	}
 
 	<- m.done
-	fmt.Println("Done reseived")
 
 	for d := range m.Sources {
-		fmt.Println("Sending done to watcher", d)
 		doneMap[d] <- true
-		fmt.Println("Sent done to watcher", d)
 	}
-
-	fmt.Println("Done sent to watchers, waiting wg")
-
 	wg.Wait()
-	fmt.Println("wg wait complete")
 
 	return nil
 }

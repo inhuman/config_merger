@@ -43,18 +43,19 @@ func (j *JsonSource) Watch(done chan bool, group *sync.WaitGroup) {
 
 		w.FilterOps(watcher.Write)
 
+		handler := func() {
+			group.Add(1)
+			j.WatchHandler()
+			group.Done()
+		}
+
 		go func() {
 			for {
 				select {
 				case <-w.Event:
 					err := j.Load()
 					if err == nil {
-						group.Add(1)
-						j.WatchHandler()
-						fmt.Println("Exited from json watcher")
-						group.Done()
-						fmt.Println("Wg done sent")
-
+						handler()
 					} else {
 						fmt.Println(err)
 					}
@@ -62,7 +63,6 @@ func (j *JsonSource) Watch(done chan bool, group *sync.WaitGroup) {
 					fmt.Println(err)
 				case <-done:
 					w.Close()
-					fmt.Println("Done received to json ")
 					return
 				}
 			}
@@ -75,7 +75,5 @@ func (j *JsonSource) Watch(done chan bool, group *sync.WaitGroup) {
 		if err := w.Start(time.Second); err != nil {
 			fmt.Println(err)
 		}
-
 	}
-
 }
