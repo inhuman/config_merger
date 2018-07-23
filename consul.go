@@ -7,6 +7,7 @@ import (
 	"github.com/hashicorp/consul/watch"
 	"time"
 	"fmt"
+	"sync"
 )
 
 type KvSource struct {
@@ -56,7 +57,7 @@ func (j *KvSource) SetHttpClient(httpClient *http.Client) {
 	j.HttpClient = httpClient
 }
 
-func (j *KvSource) Watch(done chan bool) {
+func (j *KvSource) Watch(done chan bool, group sync.WaitGroup) {
 
 	if j.WatchHandler != nil {
 		wp, err := watch.Parse(map[string]interface{}{"type": "keyprefix", "prefix": j.Prefix})
@@ -72,6 +73,7 @@ func (j *KvSource) Watch(done chan bool) {
 			select {
 			case <-done:
 				wp.Stop()
+				group.Done()
 				return
 			default:
 				err := wp.Run(j.Address)
