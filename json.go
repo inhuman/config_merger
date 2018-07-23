@@ -55,6 +55,7 @@ func (j *JsonSource) Watch(done chan bool) {
 				case err := <-w.Error:
 					fmt.Println(err)
 				case <-done:
+					w.Close()
 					return
 				}
 			}
