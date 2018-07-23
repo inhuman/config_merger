@@ -5,6 +5,7 @@ import (
 	"net/http"
 	"encoding/json"
 	"reflect"
+	"sync"
 )
 
 type VaultSource struct {
@@ -108,4 +109,4 @@ func (j *VaultSource) SetHttpClient(httpClient *http.Client) {
 	j.HttpClient = httpClient
 }
 
-func (j *VaultSource) Watch(done chan bool) {}
+func (j *VaultSource) Watch(done chan bool, group sync.WaitGroup) {}

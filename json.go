@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"github.com/radovskyb/watcher"
 	"time"
+	"sync"
 )
 
 type JsonSource struct {
@@ -34,7 +35,7 @@ func (j *JsonSource) SetTargetStruct(i interface{}) {
 	j.TargetStruct = i
 }
 
-func (j *JsonSource) Watch(done chan bool) {
+func (j *JsonSource) Watch(done chan bool, group sync.WaitGroup) {
 
 	if j.WatchHandler != nil {
 		w := watcher.New()
@@ -56,6 +57,7 @@ func (j *JsonSource) Watch(done chan bool) {
 					fmt.Println(err)
 				case <-done:
 					w.Close()
+					group.Done()
 					return
 				}
 			}

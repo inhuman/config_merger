@@ -5,6 +5,7 @@ import (
 	"github.com/hashicorp/go-multierror"
 	"reflect"
 	"fmt"
+	"sync"
 )
 
 type Merger struct {
@@ -16,7 +17,7 @@ type Merger struct {
 type Source interface {
 	Load() error
 	SetTargetStruct(s interface{})
-	Watch(done chan bool)
+	Watch(done chan bool, group sync.WaitGroup)
 }
 
 func NewMerger(s interface{}) *Merger {
@@ -46,12 +47,17 @@ func (m *Merger) RunWatch() error {
 
 	var errAll *multierror.Error
 
+	var wg sync.WaitGroup
+
+
 	for _, s := range m.Sources {
 		err := s.Load()
 		if err != nil {
 			errAll = multierror.Append(errAll, err)
 		}
-		go s.Watch(m.done)
+
+		wg.Add(1)
+		go s.Watch(m.done, wg)
 	}
 
 	if errAll != nil {
@@ -59,7 +65,8 @@ func (m *Merger) RunWatch() error {
 			return errAll
 		}
 	}
-	<-m.done
+	<- m.done
+	wg.Wait()
 
 	return nil
 }
