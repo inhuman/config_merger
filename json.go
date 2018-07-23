@@ -65,11 +65,10 @@ func (j *JsonSource) Watch(done chan bool) {
 			fmt.Println(err)
 		}
 
-		go w.Wait()
-
 		if err := w.Start(time.Second); err != nil {
 			fmt.Println(err)
 		}
+		w.Wait()
 	}
 
 }
