@@ -49,7 +49,6 @@ func (m *Merger) RunWatch() error {
 
 	var wg sync.WaitGroup
 
-
 	for _, s := range m.Sources {
 		err := s.Load()
 		if err != nil {
@@ -65,11 +64,11 @@ func (m *Merger) RunWatch() error {
 			return errAll
 		}
 	}
+
 	<- m.done
 	fmt.Println("Done reseived, waiting..")
 	wg.Wait()
 	fmt.Println("wg wait complete")
-
 
 	return nil
 }

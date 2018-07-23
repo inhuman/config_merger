@@ -66,7 +66,11 @@ func (j *KvSource) Watch(done chan bool, group *sync.WaitGroup) {
 		}
 
 		wp.Datacenter = j.Datacenter
-		wp.Handler = j.handle
+		wp.Handler = func(u uint64, i interface{}) {
+			group.Add(1)
+			j.handle(u, i)
+			group.Done()
+		}
 
 		//for {
 		//	select {
@@ -86,6 +90,9 @@ func (j *KvSource) Watch(done chan bool, group *sync.WaitGroup) {
 		if err != nil {
 			fmt.Println(err)
 		}
+
+		<-done
+		wp.Stop()
 	}
 }
 
