@@ -49,14 +49,16 @@ func (m *Merger) RunWatch() error {
 
 	var wg sync.WaitGroup
 
-	for _, s := range m.Sources {
+	doneMap := make(map[int]chan bool)
+
+	for i, s := range m.Sources {
 		err := s.Load()
 		if err != nil {
 			errAll = multierror.Append(errAll, err)
 		}
 
 		wg.Add(1)
-		go s.Watch(m.done, &wg)
+		go s.Watch(doneMap[i], &wg)
 	}
 
 	if errAll != nil {
@@ -67,6 +69,15 @@ func (m *Merger) RunWatch() error {
 
 	<- m.done
 	fmt.Println("Done reseived, waiting..")
+
+
+	for d := range m.Sources {
+		fmt.Println("Sending done to watchers")
+		doneMap[d] <- true
+	}
+
+
+
 	wg.Wait()
 	fmt.Println("wg wait complete")
 
