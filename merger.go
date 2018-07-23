@@ -66,7 +66,10 @@ func (m *Merger) RunWatch() error {
 		}
 	}
 	<- m.done
+	fmt.Println("Done reseived, waiting..")
 	wg.Wait()
+	fmt.Println("wg wait complete")
+
 
 	return nil
 }
