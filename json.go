@@ -34,7 +34,7 @@ func (j *JsonSource) SetTargetStruct(i interface{}) {
 	j.TargetStruct = i
 }
 
-func (j *JsonSource) Watch() {
+func (j *JsonSource) Watch(done chan bool) {
 
 	if j.WatchHandler != nil {
 		w := watcher.New()
@@ -54,7 +54,7 @@ func (j *JsonSource) Watch() {
 					}
 				case err := <-w.Error:
 					fmt.Println(err)
-				case <-w.Closed:
+				case <-done:
 					return
 				}
 			}

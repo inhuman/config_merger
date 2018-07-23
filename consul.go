@@ -56,7 +56,7 @@ func (j *KvSource) SetHttpClient(httpClient *http.Client) {
 	j.HttpClient = httpClient
 }
 
-func (j *KvSource) Watch() {
+func (j *KvSource) Watch(done chan bool) {
 
 	if j.WatchHandler != nil {
 		wp, err := watch.Parse(map[string]interface{}{"type": "keyprefix", "prefix": j.Prefix})
@@ -69,11 +69,17 @@ func (j *KvSource) Watch() {
 		wp.Handler = j.handle
 
 		for {
-			err := wp.Run(j.Address)
-			if err != nil {
-				fmt.Println(err)
+			select {
+			case <-done:
+				wp.Stop()
+				return
+			default:
+				err := wp.Run(j.Address)
+				if err != nil {
+					fmt.Println(err)
+				}
+				time.Sleep(time.Second)
 			}
-			time.Sleep(time.Second)
 		}
 	}
 }
