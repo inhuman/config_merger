@@ -73,7 +73,7 @@ func (m *Merger) RunWatch() error {
 	fmt.Println("Done reseived")
 
 	for d := range m.Sources {
-		fmt.Println("Sending done to watchers")
+		fmt.Println("Sending done to watcher", d)
 		doneMap[d] <- true
 	}
 
