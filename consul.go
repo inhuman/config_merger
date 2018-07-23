@@ -90,7 +90,8 @@ func (j *KvSource) Watch(done chan bool, group *sync.WaitGroup) {
 		if err != nil {
 			fmt.Println(err)
 		}
-		<-done
+		<- done
+
 		fmt.Print("Done received, stopping watch plan")
 		wp.Stop()
 	}
