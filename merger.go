@@ -58,8 +58,8 @@ func (m *Merger) RunWatch() error {
 		}
 
 		doneMap[i] = make(chan bool)
+		fmt.Println("Done chan created for watcher", i)
 
-		wg.Add(1)
 		go s.Watch(doneMap[i], &wg)
 	}
 
