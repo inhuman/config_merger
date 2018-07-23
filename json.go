@@ -53,6 +53,7 @@ func (j *JsonSource) Watch(done chan bool, group sync.WaitGroup) {
 						fmt.Println("Exited from json watcher")
 						group.Done()
 						fmt.Println("Wg done sent")
+
 					} else {
 						fmt.Println(err)
 					}
@@ -69,8 +70,6 @@ func (j *JsonSource) Watch(done chan bool, group sync.WaitGroup) {
 		if err := w.Add(j.Path); err != nil {
 			fmt.Println(err)
 		}
-
-		go w.Wait()
 
 		if err := w.Start(time.Second); err != nil {
 			fmt.Println(err)
