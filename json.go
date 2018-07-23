@@ -50,6 +50,7 @@ func (j *JsonSource) Watch(done chan bool, group sync.WaitGroup) {
 					err := j.Load()
 					if err == nil {
 						j.WatchHandler()
+						group.Done()
 					} else {
 						fmt.Println(err)
 					}
