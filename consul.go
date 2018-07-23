@@ -92,16 +92,12 @@ func (j *KvSource) Watch(done chan bool, group *sync.WaitGroup) {
 				fmt.Println(err)
 			}
 		}()
-
-
-
 		fmt.Println("kv watcher started")
 
-		select {
-		case <-done:
-			fmt.Print("Done received, stopping watch plan")
-			wp.Stop()
-		}
+		<-done
+
+		fmt.Println("Done received, stopping watch plan")
+		wp.Stop()
 	}
 }
 
