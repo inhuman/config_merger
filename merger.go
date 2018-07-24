@@ -6,52 +6,23 @@ import (
 	"reflect"
 	"fmt"
 	"sync"
-	"time"
-	"sync/atomic"
-	"github.com/pkg/errors"
 )
 
 type Merger struct {
 	Sources            []Source
 	TargetConfigStruct interface{}
-	done               chan bool
-	wg                 *CountWg
+	done chan bool
 }
 
 type Source interface {
 	Load() error
 	SetTargetStruct(s interface{})
-	Watch(done chan bool, group *CountWg)
-}
-
-type CountWg struct {
-	sync.WaitGroup
-	Count int32
-}
-
-func (cg *CountWg) Add(delta int) {
-	atomic.AddInt32(&cg.Count, int32(delta))
-	cg.WaitGroup.Add(delta)
-	fmt.Println("count wg added", delta, cg.Count)
-}
-
-// Decrement on Done
-func (cg *CountWg) Done() {
-	atomic.AddInt32(&cg.Count, -1)
-	cg.WaitGroup.Done()
-	fmt.Println("count wg done", cg.Count)
-}
-
-func (cg *CountWg) DoneAll() {
-	for i := 0; int32(i) <= cg.Count; i++ {
-		cg.Done()
-	}
+	Watch(done chan bool, group *sync.WaitGroup)
 }
 
 func NewMerger(s interface{}) *Merger {
 	m := &Merger{
 		done: make(chan bool),
-		wg: &CountWg{},
 	}
 
 	if reflect.ValueOf(s).Kind() != reflect.Ptr {
@@ -76,6 +47,8 @@ func (m *Merger) RunWatch() error {
 
 	var errAll *multierror.Error
 
+	var wg sync.WaitGroup
+
 	doneMap := make(map[int]chan bool)
 
 	for i, s := range m.Sources {
@@ -84,7 +57,7 @@ func (m *Merger) RunWatch() error {
 			errAll = multierror.Append(errAll, err)
 		}
 		doneMap[i] = make(chan bool)
-		go s.Watch(doneMap[i], m.wg)
+		go s.Watch(doneMap[i], &wg)
 	}
 
 	if errAll != nil {
@@ -93,34 +66,18 @@ func (m *Merger) RunWatch() error {
 		}
 	}
 
-	<-m.done
+	<- m.done
 
 	for d := range m.Sources {
 		doneMap[d] <- true
 	}
-	fmt.Println("Waiting until all handlers done")
-	m.wg.Wait()
+	wg.Wait()
 
 	return nil
 }
 
-func (m *Merger) StopWatch(timeout time.Duration) error{
-
-
-	if timeout == 0 {
-		m.done <- true
-		return nil
-
-	} else {
-		<- time.After(timeout)
-
-		if m.wg.Count > 0 {
-			m.wg.DoneAll()
-			m.done <- true
-			return errors.New("handlers was stopped by timeout")
-		}
-		return nil
-	}
+func (m *Merger) StopWatch() {
+	m.done <- true
 }
 
 func (m *Merger) Run() error {
