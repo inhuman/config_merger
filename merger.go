@@ -51,6 +51,7 @@ func (cg *CountWg) DoneAll() {
 func NewMerger(s interface{}) *Merger {
 	m := &Merger{
 		done: make(chan bool),
+		wg: &CountWg{},
 	}
 
 	if reflect.ValueOf(s).Kind() != reflect.Ptr {
