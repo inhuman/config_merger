@@ -28,20 +28,20 @@ type CountWg struct {
 	Count int32
 }
 
-func (cg CountWg) Add(delta int) {
+func (cg *CountWg) Add(delta int) {
 	atomic.AddInt32(&cg.Count, int32(delta))
 	cg.WaitGroup.Add(delta)
 	fmt.Println("count wg added", delta, cg.Count)
 }
 
 // Decrement on Done
-func (cg CountWg) Done() {
+func (cg *CountWg) Done() {
 	atomic.AddInt32(&cg.Count, -1)
 	cg.WaitGroup.Done()
 	fmt.Println("count wg done", cg.Count)
 }
 
-func (cg CountWg) DoneAll() {
+func (cg *CountWg) DoneAll() {
 	for i := 0; int32(i) <= cg.Count; i++ {
 		cg.Done()
 	}
