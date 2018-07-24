@@ -29,7 +29,7 @@ type CountWg struct {
 }
 
 func (cg CountWg) Add(delta int) {
-	atomic.AddInt32(&cg.Count, -1)
+	atomic.AddInt32(&cg.Count, int32(delta))
 	cg.WaitGroup.Add(delta)
 }
 
