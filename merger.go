@@ -15,7 +15,7 @@ type Merger struct {
 	Sources            []Source
 	TargetConfigStruct interface{}
 	done               chan bool
-	wg                 CountWg
+	wg                 *CountWg
 }
 
 type Source interface {
@@ -83,7 +83,7 @@ func (m *Merger) RunWatch() error {
 			errAll = multierror.Append(errAll, err)
 		}
 		doneMap[i] = make(chan bool)
-		go s.Watch(doneMap[i], &m.wg)
+		go s.Watch(doneMap[i], m.wg)
 	}
 
 	if errAll != nil {
