@@ -97,7 +97,6 @@ func (m *Merger) Run() error {
 		}
 	}
 
-
 	return nil
 }
 
