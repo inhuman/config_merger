@@ -73,6 +73,8 @@ func (m *Merger) RunWatch() error {
 	}
 	wg.Wait()
 
+	fmt.Println("Exiting run watch")
+
 	return nil
 }
 
