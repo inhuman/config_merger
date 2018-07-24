@@ -31,12 +31,14 @@ type CountWg struct {
 func (cg CountWg) Add(delta int) {
 	atomic.AddInt32(&cg.Count, int32(delta))
 	cg.WaitGroup.Add(delta)
+	fmt.Println("count wg added", delta, cg.Count)
 }
 
 // Decrement on Done
 func (cg CountWg) Done() {
 	atomic.AddInt32(&cg.Count, -1)
 	cg.WaitGroup.Done()
+	fmt.Println("count wg done", cg.Count)
 }
 
 func (cg CountWg) DoneAll() {
