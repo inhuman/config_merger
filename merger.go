@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"sync"
 	"time"
+	"sync/atomic"
 )
 
 type Merger struct {
@@ -24,22 +25,22 @@ type Source interface {
 
 type CountWg struct {
 	sync.WaitGroup
-	Count int
+	Count int32
 }
 
 func (cg CountWg) Add(delta int) {
-	cg.Count += delta
+	atomic.AddInt32(&cg.Count, -1)
 	cg.WaitGroup.Add(delta)
 }
 
 // Decrement on Done
 func (cg CountWg) Done() {
-	cg.Count--
+	atomic.AddInt32(&cg.Count, -1)
 	cg.WaitGroup.Done()
 }
 
 func (cg CountWg) DoneAll() {
-	for i := 0; i <= cg.Count; i++ {
+	for i := 0; int32(i) <= cg.Count; i++ {
 		cg.Done()
 	}
 }
@@ -100,6 +101,8 @@ func (m *Merger) RunWatch() error {
 }
 
 func (m *Merger) StopWatch(timeout time.Duration) {
+
+	//TODO: fix timeout
 
 	if timeout == 0 {
 		m.done <- true
