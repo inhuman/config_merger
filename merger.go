@@ -75,7 +75,6 @@ func (m *Merger) RunWatch() error {
 
 	var errAll *multierror.Error
 
-
 	doneMap := make(map[int]chan bool)
 
 	for i, s := range m.Sources {
@@ -114,6 +113,7 @@ func (m *Merger) StopWatch(timeout time.Duration) error{
 		<- time.After(timeout)
 
 		if m.wg.Count > 0 {
+			m.done <- true
 			m.wg.DoneAll()
 			return errors.New("handlers was stopped by timeout")
 		}
