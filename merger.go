@@ -8,6 +8,7 @@ import (
 	"sync"
 	"time"
 	"sync/atomic"
+	"github.com/pkg/errors"
 )
 
 type Merger struct {
@@ -102,15 +103,21 @@ func (m *Merger) RunWatch() error {
 	return nil
 }
 
-func (m *Merger) StopWatch(timeout time.Duration) {
+func (m *Merger) StopWatch(timeout time.Duration) error{
 
-	//TODO: fix timeout
 
 	if timeout == 0 {
 		m.done <- true
+		return nil
+
 	} else {
 		<- time.After(timeout)
-		m.wg.DoneAll()
+
+		if m.wg.Count > 0 {
+			m.wg.DoneAll()
+			return errors.New("handlers was stopped by timeout")
+		}
+		return nil
 	}
 }
 
