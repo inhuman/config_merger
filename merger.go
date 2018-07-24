@@ -6,7 +6,6 @@ import (
 	"reflect"
 	"fmt"
 	"sync"
-	"log"
 )
 
 type Merger struct {
@@ -66,21 +65,12 @@ func (m *Merger) RunWatch() error {
 			return errAll
 		}
 	}
-
-	log.Println("Waiting stop watch call")
 	<- m.done
-	log.Println("Stop watch received, sending stop to watchers")
 
 	for d := range m.Sources {
-		log.Println("Sent stop to watcher", d)
 		doneMap[d] <- true
 	}
-
-	log.Println("Waiting wait group done")
 	wg.Wait()
-
-	log.Println("Exiting run watch")
-
 	return nil
 }
 
