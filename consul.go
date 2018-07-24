@@ -67,7 +67,11 @@ func (j *KvSource) Watch(done chan bool, group *CountWg) {
 		wp.Datacenter = j.Datacenter
 		wp.Handler = func(u uint64, i interface{}) {
 			group.Add(1)
+			fmt.Println("wg count after add", group.Count)
+
 			j.handle(u, i)
+
+			fmt.Println("wg count before done", group.Count)
 			group.Done()
 		}
 
