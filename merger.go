@@ -98,6 +98,7 @@ func (m *Merger) RunWatch() error {
 	for d := range m.Sources {
 		doneMap[d] <- true
 	}
+	fmt.Println("Waiting until all handlers done")
 	m.wg.Wait()
 
 	return nil
@@ -114,8 +115,8 @@ func (m *Merger) StopWatch(timeout time.Duration) error{
 		<- time.After(timeout)
 
 		if m.wg.Count > 0 {
-			m.done <- true
 			m.wg.DoneAll()
+			m.done <- true
 			return errors.New("handlers was stopped by timeout")
 		}
 		return nil
