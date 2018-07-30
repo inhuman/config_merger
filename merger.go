@@ -117,7 +117,7 @@ func (m *Merger) StopDisconnectTimeout(address string, timeout time.Duration) {
 				fmt.Println("can not reach server")
 				m.StopWatch()
 			}
-			<- time.After(1 * time.Second)
+			<- time.After(timeout * time.Second)
 		}
 	}()
 }
