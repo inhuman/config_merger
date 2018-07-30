@@ -6,6 +6,8 @@ import (
 	"reflect"
 	"fmt"
 	"sync"
+	"time"
+	"net"
 )
 
 type Merger struct {
@@ -100,4 +102,22 @@ func (m *Merger) Run() error {
 
 func (m *Merger) GetFinalConfig() map[string]interface{} {
 	return structs.Map(m.TargetConfigStruct)
+}
+
+
+func (m *Merger) StopDisconnectTimeout(address string, timeout time.Duration) {
+
+	go func() {
+		for {
+			conn, err := net.Dial("tcp", address)
+			if err != nil {
+				fmt.Errorf("TCP error : %s", err.Error())
+			}
+			if conn == nil {
+				fmt.Println("can not reach server")
+				m.StopWatch()
+			}
+			<- time.After(1 * time.Second)
+		}
+	}()
 }
