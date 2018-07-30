@@ -7,6 +7,7 @@ import (
 	"github.com/hashicorp/consul/watch"
 	"fmt"
 	"sync"
+	"time"
 )
 
 type KvSource struct {
@@ -16,6 +17,7 @@ type KvSource struct {
 	HttpClient   *http.Client
 	WatchHandler func()
 	TargetStruct interface{}
+	Timeout		 time.Duration // timeout if disconnect exit
 }
 
 func (j *KvSource) Load() error {
