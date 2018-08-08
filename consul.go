@@ -1,11 +1,12 @@
 package config_merger
 
 import (
-	"github.com/hashicorp/consul/api"
 	"encoding/json"
-	"net/http"
-	"github.com/hashicorp/consul/watch"
+	"errors"
 	"fmt"
+	"github.com/hashicorp/consul/api"
+	"github.com/hashicorp/consul/watch"
+	"net/http"
 	"sync"
 	"time"
 )
@@ -17,7 +18,7 @@ type KvSource struct {
 	HttpClient   *http.Client
 	WatchHandler func()
 	TargetStruct interface{}
-	Timeout		 time.Duration // timeout if disconnect exit
+	Timeout      time.Duration // timeout if disconnect exit
 }
 
 func (j *KvSource) Load() error {
@@ -42,9 +43,13 @@ func (j *KvSource) Load() error {
 		return err
 	}
 
-	err = json.Unmarshal([]byte(kvPair.Value), j.TargetStruct)
-	if err != nil {
-		return err
+	if kvPair != nil {
+		err = json.Unmarshal([]byte(kvPair.Value), j.TargetStruct)
+		if err != nil {
+			return err
+		}
+	} else {
+		return errors.New("kv pair is nil")
 	}
 
 	return nil
