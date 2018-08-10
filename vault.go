@@ -60,14 +60,14 @@ func (j *VaultSource) Load() error {
 	return nil
 }
 
-func processTags(t reflect.Type, v reflect.Value, b []byte) error {
+func processVaultTags(t reflect.Type, v reflect.Value, b []byte) error {
 
 	for i := 0; i < t.NumField(); i++ {
 		field := t.Field(i)
 		value := v.Field(i)
 
 		if field.Type.Kind() == reflect.Struct {
-			err := processTags(field.Type, value, b)
+			err := processVaultTags(field.Type, value, b)
 			if err != nil {
 				return err
 			}
@@ -98,7 +98,7 @@ func fillFieldsByTags(i interface{}, b []byte) {
 	t := reflect.TypeOf(i).Elem()
 	v := reflect.ValueOf(i).Elem()
 
-	processTags(t, v, b)
+	processVaultTags(t, v, b)
 }
 
 func (j *VaultSource) SetTargetStruct(s interface{}) {
