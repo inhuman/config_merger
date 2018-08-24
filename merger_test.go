@@ -50,12 +50,6 @@ func TestMerger_GetFinalConfig(t *testing.T) {
 	assert.Equal(t, map[string]interface{}{"Message": ""}, merger.GetFinalConfig())
 }
 
-func TestNewMerger(t *testing.T) {
-	merger := NewMerger(&Cnf{})
-
-	assert.Equal(t, &Merger{TargetConfigStruct: &Cnf{}}, merger)
-}
-
 func TestMerger_Run(t *testing.T) {
 	cnf := &Cnf{}
 	merger := NewMerger(cnf)
