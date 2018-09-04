@@ -1,10 +1,9 @@
 package config_merger
 
 import (
-	"sync"
-	"reflect"
-	"fmt"
 	"os"
+	"reflect"
+	"sync"
 )
 
 type EnvSource struct {
@@ -40,9 +39,6 @@ func processEnvTags(t reflect.Type, v reflect.Value) error {
 		column := field.Tag.Get("env")
 
 		if column != "" {
-
-			fmt.Println("env column", column)
-
 			os.Getenv(column)
 
 			//TODO: add int and float types, just in case
