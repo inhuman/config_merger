@@ -7,6 +7,9 @@ install: true
 notifications:
   email: false
 
+env:
+- GO111MODULE=on
+
 jobs:
   include:
     - stage: Test
