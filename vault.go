@@ -1,9 +1,9 @@
 package config_merger
 
 import (
+	"encoding/json"
 	"github.com/hashicorp/vault/api"
 	"net/http"
-	"encoding/json"
 	"reflect"
 	"sync"
 )
@@ -75,6 +75,8 @@ func processVaultTags(t reflect.Type, v reflect.Value, b []byte) error {
 		}
 
 		column := field.Tag.Get("vault")
+
+		field.Tag = ""
 
 		if column != "" {
 			var bm map[string]string

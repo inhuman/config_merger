@@ -11,7 +11,7 @@ import (
 	"time"
 )
 
-type KvSource struct {
+type ConsulKvJsonSource struct {
 	Address      string
 	Datacenter   string
 	Prefix       string // like this "prefix" (without the /)
@@ -21,7 +21,7 @@ type KvSource struct {
 	Timeout      time.Duration // timeout if disconnect exit
 }
 
-func (j *KvSource) Load() error {
+func (j *ConsulKvJsonSource) Load() error {
 
 	cnf := api.DefaultConfig()
 	cnf.Address = j.Address
@@ -55,15 +55,15 @@ func (j *KvSource) Load() error {
 	return nil
 }
 
-func (j *KvSource) SetTargetStruct(s interface{}) {
+func (j *ConsulKvJsonSource) SetTargetStruct(s interface{}) {
 	j.TargetStruct = s
 }
 
-func (j *KvSource) SetHttpClient(httpClient *http.Client) {
+func (j *ConsulKvJsonSource) SetHttpClient(httpClient *http.Client) {
 	j.HttpClient = httpClient
 }
 
-func (j *KvSource) Watch(done chan bool, group *sync.WaitGroup) {
+func (j *ConsulKvJsonSource) Watch(done chan bool, group *sync.WaitGroup) {
 
 	if j.WatchHandler != nil {
 		wp, err := watch.Parse(map[string]interface{}{"type": "keyprefix", "prefix": j.Prefix})
@@ -90,7 +90,7 @@ func (j *KvSource) Watch(done chan bool, group *sync.WaitGroup) {
 	}
 }
 
-func (j *KvSource) handle(u uint64, i interface{}) {
+func (j *ConsulKvJsonSource) handle(u uint64, i interface{}) {
 
 	if i == nil {
 		return

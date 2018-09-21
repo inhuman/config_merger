@@ -1,10 +1,10 @@
 package config_merger
 
 import (
-	"testing"
+	"github.com/stretchr/testify/assert"
 	"gopkg.in/h2non/gock.v1"
 	"net/http"
-	"github.com/stretchr/testify/assert"
+	"testing"
 	"time"
 )
 
@@ -26,7 +26,7 @@ func TestKvSource_LoadSuccess(t *testing.T) {
     }
 ]`)
 
-	kvSource := &KvSource{
+	kvSource := &ConsulKvJsonSource{
 		Address:    "consul.example.local:8500",
 		Datacenter: "test",
 		Prefix:     "test/prefix",
@@ -47,7 +47,7 @@ func TestKvSource_LoadSuccess(t *testing.T) {
 
 func TestKvSource_LoadWrongAddr(t *testing.T) {
 
-	kvSource := &KvSource{
+	kvSource := &ConsulKvJsonSource{
 		Address:    "consul.example.local:8500",
 		Datacenter: "test",
 		Prefix:     "test/prefix",

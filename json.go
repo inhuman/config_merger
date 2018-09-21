@@ -1,12 +1,12 @@
 package config_merger
 
 import (
-	"io/ioutil"
 	"encoding/json"
 	"fmt"
 	"github.com/radovskyb/watcher"
-	"time"
+	"io/ioutil"
 	"sync"
+	"time"
 )
 
 type JsonSource struct {

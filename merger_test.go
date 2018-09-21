@@ -178,7 +178,7 @@ func TestMerger_FullTest(t *testing.T) {
 
 	defer gock.Off()
 
-	kvSource := &KvSource{
+	kvSource := &ConsulKvJsonSource{
 		Address:    "consul.example.local:8500",
 		Datacenter: "test",
 		Prefix:     "test/prefix",
