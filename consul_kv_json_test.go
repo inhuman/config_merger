@@ -8,7 +8,7 @@ import (
 	"time"
 )
 
-func TestKvSource_LoadSuccess(t *testing.T) {
+func TestKvJSONSource_LoadSuccess(t *testing.T) {
 
 	defer gock.Off()
 
@@ -45,7 +45,7 @@ func TestKvSource_LoadSuccess(t *testing.T) {
 	assert.Equal(t, "from kv", cnf.Message)
 }
 
-func TestKvSource_LoadWrongAddr(t *testing.T) {
+func TestKvJSONSource_LoadWrongAddr(t *testing.T) {
 
 	kvSource := &ConsulKvJsonSource{
 		Address:    "consul.example.local:8500",

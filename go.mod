@@ -62,6 +62,7 @@ require (
 	github.com/hashicorp/vault v0.11.1
 	github.com/hashicorp/vault-plugin-secrets-kv v0.0.0-20180825215324-5a464a61f7de // indirect
 	github.com/hashicorp/yamux v0.0.0-20180917205041-7221087c3d28 // indirect
+	github.com/inhuman/consul-kv-mapper v0.0.0-20180816140018-bac235d734fb
 	github.com/jefferai/jsonx v0.0.0-20160721235117-9cc31c3135ee // indirect
 	github.com/keybase/go-crypto v0.0.0-20180920171116-0b2a91ace448 // indirect
 	github.com/kr/pretty v0.1.0 // indirect
