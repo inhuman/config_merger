@@ -1,8 +1,10 @@
 package config_merger
 
 import (
-	"reflect"
 	"errors"
+	"github.com/hashicorp/go-multierror"
+	"log"
+	"reflect"
 )
 
 type validator func(s interface{}) error
@@ -53,10 +55,51 @@ func isDuplicateTags(t reflect.Type, tags []string) error {
 
 			tags = append(tags, column)
 		}
-
-
-
 	}
 
 	return nil
+}
+
+
+func (m *Merger) checkRequiredFields() error {
+
+	t := reflect.TypeOf(m.TargetConfigStruct).Elem()
+	v := reflect.ValueOf(m.TargetConfigStruct).Elem()
+
+	var errAll *multierror.Error
+
+	err := processRequiredTags(t, v, errAll)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+
+func processRequiredTags(t reflect.Type, v reflect.Value, err *multierror.Error) *multierror.Error {
+
+	for i := 0; i < t.NumField(); i++ {
+		field := t.Field(i)
+		value := v.Field(i)
+
+		if field.Type.Kind() == reflect.Struct {
+			return processRequiredTags(field.Type, value, err)
+		}
+
+		column := field.Tag.Get("required")
+
+		log.Println("column ", column)
+
+		if column == "true" {
+			//TODO: add int and float types, just in case
+			if value.String() == "" {
+				log.Println("found empty field")
+				newErr := errors.New("Required value " + field.Name + "is empty")
+				err = multierror.Append(err, newErr)
+			}
+		}
+	}
+
+	return err
 }

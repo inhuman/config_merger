@@ -97,13 +97,18 @@ func (m *Merger) Run() error {
 		}
 	}
 
+	err := m.checkRequiredFields()
+
+	if err != nil {
+		return err
+	}
+
 	return nil
 }
 
 func (m *Merger) GetFinalConfig() map[string]interface{} {
 	return structs.Map(m.TargetConfigStruct)
 }
-
 
 func (m *Merger) StopDisconnectTimeout(address string, timeout time.Duration) {
 
