@@ -19,7 +19,7 @@ import (
 )
 
 type Config struct {
-	Message        string `json:"message"`
+	Message        string `json:"message" required:"true"`
 	IntValue       int    `json:"int_value"`
 	FloatValue     string `consul:"nested_password/another_level/one_more/key3"`
 	Login          string `json:"login" env:"ENV_LOGIN" consul:"login"`
