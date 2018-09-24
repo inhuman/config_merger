@@ -90,7 +90,7 @@ func processRequiredTags(t reflect.Type, v reflect.Value, err *multierror.Error)
 		if column == "true" {
 			//TODO: add int and float types, just in case
 			if value.String() == "" {
-				newErr := errors.New("Required value " + field.Name + "is empty")
+				newErr := errors.New("Required value " + field.Name + " is empty")
 				err = multierror.Append(err, newErr)
 			}
 		}
