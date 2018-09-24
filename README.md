@@ -19,13 +19,13 @@ import (
 )
 
 type Config struct {
-	Message    string  `json:"message"`
-	IntValue   int     `json:"int_value"`
-	FloatValue float32 `json:"float_value"`
-	Login      string  `json:"login"`
-	Password   string  `json:"password"`
-	NestedPassword struct{
-		Pass1 string `json:"pass_1" vault:"pass_1"`
+	Message        string `json:"message"`
+	IntValue       int    `json:"int_value"`
+	FloatValue     string `consul:"nested_password/another_level/one_more/key3"`
+	Login          string `json:"login" env:"ENV_LOGIN" consul:"login"`
+	Password       string `json:"password" env:"ENV_PASSWORD" consul:"nested_password/pass_1"`
+	NestedPassword struct {
+		Pass1 string `json:"pass_1" vault:"pass_1" env:"ENV_PASSWORD" consul:"nested_password/another_level/key"`
 	} `json:"nested_password"`
 }
 
@@ -44,14 +44,21 @@ func main()  {
 	merger.AddSource(jsonSource)
 
 
-	// add consul kv source
-	consulKvSource := &configMerger.KvSource{
+	// add consul kv json source
+	consulKvJsonSource := &configMerger.KvJsonSource{
 		Address: "consul.addr:8500",
 		Prefix: "conf_merger/json",
 		Datacenter: "experiments",
 	}
-	merger.AddSource(consulKvSource)
+	merger.AddSource(consulKvJsonSource)
 
+	// add consul kv source
+	consulKvJsonSource := &configMerger.KvSource{
+		Address: "consul.addr:8500",
+		Prefix: "conf_merger/config",
+		Datacenter: "experiments",
+	}
+	merger.AddSource(consulKvSource)
 
 	// add vault source
 	vaultSource := &configMerger.VaultSource{
