@@ -3,7 +3,6 @@ package config_merger
 import (
 	"errors"
 	"github.com/hashicorp/go-multierror"
-	"log"
 	"reflect"
 )
 
@@ -88,13 +87,9 @@ func processRequiredTags(t reflect.Type, v reflect.Value, err *multierror.Error)
 		}
 
 		column := field.Tag.Get("required")
-
-		log.Println("column ", column)
-
 		if column == "true" {
 			//TODO: add int and float types, just in case
 			if value.String() == "" {
-				log.Println("found empty field")
 				newErr := errors.New("Required value " + field.Name + "is empty")
 				err = multierror.Append(err, newErr)
 			}
