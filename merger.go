@@ -5,6 +5,8 @@ import (
 	"github.com/hashicorp/go-multierror"
 	"reflect"
 	"fmt"
+	"strconv"
+	"strings"
 	"sync"
 	"time"
 	"net"
@@ -109,6 +111,54 @@ func (m *Merger) Run() error {
 func (m *Merger) GetFinalConfig() map[string]interface{} {
 	return structs.Map(m.TargetConfigStruct)
 }
+
+func (m *Merger) PrintConfig() {
+
+	t := reflect.TypeOf(m.TargetConfigStruct).Elem()
+	v := reflect.ValueOf(m.TargetConfigStruct).Elem()
+
+	fmt.Println(reflect.TypeOf(m.TargetConfigStruct))
+
+	processPrint(t, v, "  ")
+
+}
+
+func processPrint(t reflect.Type, v reflect.Value, offset string) {
+
+	for i := 0; i < t.NumField(); i++ {
+		field := t.Field(i)
+		value := v.Field(i)
+
+		if field.Type.Kind() == reflect.Struct {
+			fmt.Println(offset + field.Name)
+			offset += "  "
+			processPrint(field.Type, value, offset)
+		} else {
+
+			column := field.Tag.Get("show_last_symbols")
+			if column != "" {
+
+				maskLast, err := strconv.Atoi(column)
+				if err == nil {
+					fmt.Println(offset + field.Name + ": " + maskString(value.String(), maskLast))
+				} else {
+					fmt.Println(err)
+				}
+
+			} else {
+				fmt.Println(offset + field.Name + ": " + value.String())
+			}
+		}
+	}
+}
+
+func maskString(s string, showLastSymbols int) string {
+	if len(s) <= showLastSymbols {
+		return s
+	}
+	return strings.Repeat("*", len(s)-showLastSymbols) + s[len(s)-showLastSymbols:]
+}
+
 
 func (m *Merger) StopDisconnectTimeout(address string, timeout time.Duration) {
 
