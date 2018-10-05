@@ -131,9 +131,9 @@ func processPrint(t reflect.Type, v reflect.Value, offset string) {
 
 		if field.Type.Kind() == reflect.Struct {
 			fmt.Println(offset + field.Name)
-			offset += "  "
-			processPrint(field.Type, value, offset)
-		} else {
+			processPrint(field.Type, value, offset + "  ")
+
+			} else {
 
 			column := field.Tag.Get("show_last_symbols")
 			if column != "" {
