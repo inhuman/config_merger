@@ -3,6 +3,7 @@ package config_merger
 import (
 	"os"
 	"reflect"
+	"strconv"
 	"sync"
 )
 
@@ -41,8 +42,27 @@ func processEnvTags(t reflect.Type, v reflect.Value) error {
 		if column != "" {
 			os.Getenv(column)
 
-			//TODO: add int and float types, just in case
-			value.SetString(os.Getenv(column))
+			//TODO: add float type, just in case
+			v := os.Getenv(column)
+
+			switch value.Kind() {
+			case reflect.String:
+				value.SetString(v)
+
+			case reflect.Int:
+				i, err := strconv.ParseInt(v, 10, 64)
+				if err != nil {
+					return err
+				}
+				value.SetInt(i)
+
+			case reflect.Bool:
+				b, err := strconv.ParseBool(v)
+				if err != nil {
+					return err
+				}
+				value.SetBool(b)
+			}
 		}
 	}
 	return nil

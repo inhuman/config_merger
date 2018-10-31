@@ -1,15 +1,15 @@
 package config_merger
 
 import (
+	"fmt"
 	"github.com/fatih/structs"
 	"github.com/hashicorp/go-multierror"
+	"net"
 	"reflect"
-	"fmt"
 	"strconv"
 	"strings"
 	"sync"
 	"time"
-	"net"
 )
 
 type Merger struct {
