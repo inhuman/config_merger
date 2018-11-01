@@ -146,7 +146,14 @@ func processPrint(t reflect.Type, v reflect.Value, offset string) {
 				}
 
 			} else {
-				fmt.Println(offset + field.Name + ": " + value.String())
+
+				val := value.String()
+
+				if value.Kind() == reflect.Bool {
+					val = fmt.Sprintf("%t",value.Bool())
+				}
+
+				fmt.Println(offset + field.Name + ": " + val)
 			}
 		}
 	}
