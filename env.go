@@ -39,8 +39,6 @@ func (e *EnvSource) processEnvTags(t reflect.Type, v reflect.Value) error {
 
 		column := field.Tag.Get("env")
 
-
-
 		if (column != "") && (StringInSlice(column, e.Variables)) {
 			os.Getenv(column)
 
@@ -68,7 +66,6 @@ func (e *EnvSource) processEnvTags(t reflect.Type, v reflect.Value) error {
 	}
 	return nil
 }
-
 
 func (e *EnvSource) Watch(done chan bool, group *sync.WaitGroup) {
 	<-done

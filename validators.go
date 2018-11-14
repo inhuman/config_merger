@@ -59,7 +59,6 @@ func isDuplicateTags(t reflect.Type, tags []string) error {
 	return nil
 }
 
-
 func (m *Merger) checkRequiredFields() error {
 
 	t := reflect.TypeOf(m.TargetConfigStruct).Elem()
@@ -74,7 +73,6 @@ func (m *Merger) checkRequiredFields() error {
 
 	return nil
 }
-
 
 func processRequiredTags(t reflect.Type, v reflect.Value, err *multierror.Error) *multierror.Error {
 
@@ -97,7 +95,7 @@ func processRequiredTags(t reflect.Type, v reflect.Value, err *multierror.Error)
 				}
 
 			case reflect.Int:
-				if v.Int() == 0 {
+				if value.Int() == 0 {
 					newErr := errors.New("Required value " + field.Name + " is empty")
 					err = multierror.Append(err, newErr)
 				}
