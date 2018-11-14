@@ -44,7 +44,6 @@ func (e *EnvSource) processEnvTags(t reflect.Type, v reflect.Value) error {
 		if (column != "") && (StringInSlice(column, e.Variables)) {
 			os.Getenv(column)
 
-			//TODO: add float type, just in case
 			v := os.Getenv(column)
 
 			switch value.Kind() {
