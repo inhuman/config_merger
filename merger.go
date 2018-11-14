@@ -7,7 +7,6 @@ import (
 	"net"
 	"reflect"
 	"strconv"
-	"strings"
 	"sync"
 	"time"
 )
@@ -15,7 +14,7 @@ import (
 type Merger struct {
 	Sources            []Source
 	TargetConfigStruct interface{}
-	done chan bool
+	done               chan bool
 }
 
 type Source interface {
@@ -69,7 +68,7 @@ func (m *Merger) RunWatch() error {
 			return errAll
 		}
 	}
-	<- m.done
+	<-m.done
 
 	for d := range m.Sources {
 		doneMap[d] <- true
@@ -131,9 +130,9 @@ func processPrint(t reflect.Type, v reflect.Value, offset string) {
 
 		if field.Type.Kind() == reflect.Struct {
 			fmt.Println(offset + field.Name)
-			processPrint(field.Type, value, offset + "  ")
+			processPrint(field.Type, value, offset+"  ")
 
-			} else {
+		} else {
 
 			column := field.Tag.Get("show_last_symbols")
 			if column != "" {
@@ -150,7 +149,7 @@ func processPrint(t reflect.Type, v reflect.Value, offset string) {
 				val := value.String()
 
 				if value.Kind() == reflect.Bool {
-					val = fmt.Sprintf("%t",value.Bool())
+					val = fmt.Sprintf("%t", value.Bool())
 				}
 
 				fmt.Println(offset + field.Name + ": " + val)
@@ -158,8 +157,6 @@ func processPrint(t reflect.Type, v reflect.Value, offset string) {
 		}
 	}
 }
-
-
 
 func (m *Merger) StopDisconnectTimeout(address string, timeout time.Duration) {
 
@@ -173,7 +170,7 @@ func (m *Merger) StopDisconnectTimeout(address string, timeout time.Duration) {
 				fmt.Println("can not reach server")
 				m.StopWatch()
 			}
-			<- time.After(timeout * time.Second)
+			<-time.After(timeout * time.Second)
 		}
 	}()
 }
