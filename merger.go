@@ -159,12 +159,6 @@ func processPrint(t reflect.Type, v reflect.Value, offset string) {
 	}
 }
 
-func maskString(s string, showLastSymbols int) string {
-	if len(s) <= showLastSymbols {
-		return s
-	}
-	return strings.Repeat("*", len(s)-showLastSymbols) + s[len(s)-showLastSymbols:]
-}
 
 
 func (m *Merger) StopDisconnectTimeout(address string, timeout time.Duration) {

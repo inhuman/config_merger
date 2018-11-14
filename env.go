@@ -18,19 +18,19 @@ func (e *EnvSource) Load() error {
 	t := reflect.TypeOf(e.TargetStruct).Elem()
 	v := reflect.ValueOf(e.TargetStruct).Elem()
 
-	processEnvTags(t, v)
+	e.processEnvTags(t, v)
 
 	return nil
 }
 
-func processEnvTags(t reflect.Type, v reflect.Value) error {
+func (e *EnvSource) processEnvTags(t reflect.Type, v reflect.Value) error {
 
 	for i := 0; i < t.NumField(); i++ {
 		field := t.Field(i)
 		value := v.Field(i)
 
 		if field.Type.Kind() == reflect.Struct {
-			err := processEnvTags(field.Type, value)
+			err := e.processEnvTags(field.Type, value)
 			if err != nil {
 				return err
 			}
@@ -39,7 +39,9 @@ func processEnvTags(t reflect.Type, v reflect.Value) error {
 
 		column := field.Tag.Get("env")
 
-		if column != "" {
+
+
+		if (column != "") && (StringInSlice(column, e.Variables)) {
 			os.Getenv(column)
 
 			//TODO: add float type, just in case
