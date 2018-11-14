@@ -81,7 +81,7 @@ func processRequiredTags(t reflect.Type, v reflect.Value, err *multierror.Error)
 		value := v.Field(i)
 
 		if field.Type.Kind() == reflect.Struct {
-			return processRequiredTags(field.Type, value, err)
+			processRequiredTags(field.Type, value, err)
 		}
 
 		column := field.Tag.Get("required")

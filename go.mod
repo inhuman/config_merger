@@ -93,6 +93,7 @@ require (
 	github.com/stretchr/objx v0.1.1 // indirect
 	github.com/stretchr/testify v1.2.2
 	github.com/tv42/httpunix v0.0.0-20150427012821-b75d8614f926 // indirect
+	github.com/vmware/vic v1.4.1
 	golang.org/x/crypto v0.0.0-20180910181607-0e37d006457b // indirect
 	golang.org/x/net v0.0.0-20180921000356-2f5d2388922f // indirect
 	golang.org/x/sys v0.0.0-20180920110915-d641721ec2de // indirect
