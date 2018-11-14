@@ -116,10 +116,17 @@ type testDbConnection struct {
 	Host string `env:"TEST_HOST" required:"true"`
 }
 
+type IpaAuthConfig struct {
+	Enabled bool   `env:"IPA_AUTH"`
+	Host    string `env:"IPA_HOST"`
+}
+
 type testAggregateData struct {
-	Comment string `env:"TEST_COMMENT" required:"true"`
-	Db      testDbConnection
-	User    testUserModel
+	Comment  string `env:"TEST_COMMENT" required:"true"`
+	Comment2 string `env:"TEST_COMMENT2"`
+	User     testUserModel
+	Ipa      IpaAuthConfig
+	Db       testDbConnection
 }
 
 func TestCheckRequiredFieldsSuccessENVComplexStruct(t *testing.T) {
@@ -131,7 +138,7 @@ func TestCheckRequiredFieldsSuccessENVComplexStruct(t *testing.T) {
 
 	cnf := &testAggregateData{}
 	envSource := &EnvSource{Variables: []string{
-		"TEST_LOGIN", "TEST_PASSWORD", "TEST_PORT",
+		"TEST_LOGIN", "TEST_PASSWORD", "TEST_PORT", "TEST_HOST", "IPA_AUTH", "IPA_HOST",
 	}}
 
 	m := NewMerger(cnf)
@@ -141,8 +148,8 @@ func TestCheckRequiredFieldsSuccessENVComplexStruct(t *testing.T) {
 
 	expectredErr := &multierror.Error{}
 	multierror.Append(expectredErr, errors.New("Required value Comment is empty"))
-	multierror.Append(expectredErr, errors.New("Required value Host is empty"))
 	multierror.Append(expectredErr, errors.New("Required value Password is empty"))
+	multierror.Append(expectredErr, errors.New("Required value Host is empty"))
 
 	assert.Equal(t, expectredErr, err)
 }
@@ -169,6 +176,16 @@ func cleanEnv(t *testing.T) {
 	}
 
 	err = os.Unsetenv("TEST_HOST")
+	if err != nil {
+		t.Log(err)
+	}
+
+	err = os.Unsetenv("IPA_AUTH")
+	if err != nil {
+		t.Log(err)
+	}
+
+	err = os.Unsetenv("IPA_HOST")
 	if err != nil {
 		t.Log(err)
 	}

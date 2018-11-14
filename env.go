@@ -30,18 +30,12 @@ func (e *EnvSource) processEnvTags(t reflect.Type, v reflect.Value) error {
 		value := v.Field(i)
 
 		if field.Type.Kind() == reflect.Struct {
-			err := e.processEnvTags(field.Type, value)
-			if err != nil {
-				return err
-			}
-			continue
+			e.processEnvTags(field.Type, value)
 		}
 
 		column := field.Tag.Get("env")
 
 		if (column != "") && (StringInSlice(column, e.Variables)) {
-			os.Getenv(column)
-
 			v := os.Getenv(column)
 
 			switch value.Kind() {

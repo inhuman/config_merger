@@ -66,9 +66,9 @@ func (m *Merger) checkRequiredFields() error {
 
 	var errAll *multierror.Error
 
-	err := processRequiredTags(t, v, errAll)
-	if err != nil {
-		return err
+	errAll = processRequiredTags(t, v, errAll)
+	if errAll != nil {
+		return errAll
 	}
 
 	return nil
@@ -81,10 +81,11 @@ func processRequiredTags(t reflect.Type, v reflect.Value, err *multierror.Error)
 		value := v.Field(i)
 
 		if field.Type.Kind() == reflect.Struct {
-			processRequiredTags(field.Type, value, err)
+			err = processRequiredTags(field.Type, value, err)
 		}
 
 		column := field.Tag.Get("required")
+
 		if column == "true" {
 
 			switch value.Kind() {
