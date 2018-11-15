@@ -149,13 +149,14 @@ func processPrint(t reflect.Type, v reflect.Value, offset string) {
 
 			} else {
 
-				val := value.String()
-
-				if value.Kind() == reflect.Bool {
-					val = fmt.Sprintf("%t", value.Bool())
+				switch value.Kind() {
+				case reflect.String:
+					fmt.Println(offset + field.Name + ": " + value.String())
+				case reflect.Int:
+					fmt.Printf(offset+field.Name+": %d", value.Int)
+				case reflect.Bool:
+					fmt.Printf(offset+field.Name+": %t", value.Bool())
 				}
-
-				fmt.Println(offset + field.Name + ": " + val)
 			}
 		}
 	}
