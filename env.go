@@ -18,7 +18,10 @@ func (e *EnvSource) Load() error {
 	t := reflect.TypeOf(e.TargetStruct).Elem()
 	v := reflect.ValueOf(e.TargetStruct).Elem()
 
-	e.processEnvTags(t, v)
+	err := e.processEnvTags(t, v)
+	if err != nil {
+		return err
+	}
 
 	return nil
 }
@@ -38,23 +41,25 @@ func (e *EnvSource) processEnvTags(t reflect.Type, v reflect.Value) error {
 		if (column != "") && (StringInSlice(column, e.Variables)) {
 			v := os.Getenv(column)
 
-			switch value.Kind() {
-			case reflect.String:
-				value.SetString(v)
+			if v != "" {
+				switch value.Kind() {
+				case reflect.String:
+					value.SetString(v)
 
-			case reflect.Int:
-				i, err := strconv.ParseInt(v, 10, 64)
-				if err != nil {
-					return err
-				}
-				value.SetInt(i)
+				case reflect.Int:
+					i, err := strconv.ParseInt(v, 10, 64)
+					if err != nil {
+						return err
+					}
+					value.SetInt(i)
 
-			case reflect.Bool:
-				b, err := strconv.ParseBool(v)
-				if err != nil {
-					return err
+				case reflect.Bool:
+					b, err := strconv.ParseBool(v)
+					if err != nil {
+						return err
+					}
+					value.SetBool(b)
 				}
-				value.SetBool(b)
 			}
 		}
 	}

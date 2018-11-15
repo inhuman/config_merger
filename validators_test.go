@@ -155,38 +155,28 @@ func TestCheckRequiredFieldsSuccessENVComplexStruct(t *testing.T) {
 }
 
 func cleanEnv(t *testing.T) {
-	err := os.Unsetenv("TEST_LOGIN")
-	if err != nil {
-		t.Log(err)
+
+	envsToClear := []string{
+		"TEST_LOGIN",
+		"TEST_PASSWORD",
+		"TEST_COMMENT",
+		"TEST_COMMENT1",
+		"TEST_COMMENT2",
+		"TEST_COMMENT3",
+		"TEST_COMMENT4",
+		"TEST_COMMENT5",
+		"TEST_PORT",
+		"TEST_HOST",
+		"IPA_AUTH",
+		"IPA_HOST",
+		"TEST_VALUE",
 	}
 
-	err = os.Unsetenv("TEST_PASSWORD")
-	if err != nil {
-		t.Log(err)
+	for _, envToClear := range envsToClear {
+		err := os.Unsetenv(envToClear)
+		if err != nil {
+			t.Log(err)
+		}
 	}
 
-	err = os.Unsetenv("TEST_COMMENT")
-	if err != nil {
-		t.Log(err)
-	}
-
-	err = os.Unsetenv("TEST_PORT")
-	if err != nil {
-		t.Log(err)
-	}
-
-	err = os.Unsetenv("TEST_HOST")
-	if err != nil {
-		t.Log(err)
-	}
-
-	err = os.Unsetenv("IPA_AUTH")
-	if err != nil {
-		t.Log(err)
-	}
-
-	err = os.Unsetenv("IPA_HOST")
-	if err != nil {
-		t.Log(err)
-	}
 }

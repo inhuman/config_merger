@@ -101,5 +101,5 @@ require (
 	gopkg.in/h2non/gock.v1 v1.0.10
 	gopkg.in/mgo.v2 v2.0.0-20180705113604-9856a29383ce // indirect
 	gopkg.in/vmihailenco/msgpack.v2 v2.9.1 // indirect
-	gotest.tools v2.1.0+incompatible // indirect
+	gotest.tools v2.1.0+incompatible
 )

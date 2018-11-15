@@ -97,8 +97,11 @@ func (m *Merger) Run() error {
 			return errAll
 		}
 	}
-
-	err := m.checkRequiredFields()
+	err := m.setDefaults()
+	if err != nil {
+		return err
+	}
+	err = m.checkRequiredFields()
 
 	if err != nil {
 		return err
