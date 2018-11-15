@@ -10,7 +10,7 @@ type testAggregateDataDefaults struct {
 	Comment1 string `env:"TEST_COMMENT1" default:"default comment 1"`
 	Comment2 string `env:"TEST_COMMENT2" default:"default comment 2"`
 	Comment3 string `env:"TEST_COMMENT3" default:"default comment 3"`
-	Count    int    `env:"TEST_COUNT" default:"10"`
+	Count    int    `env:"TEST_COUNT" default:"12"`
 }
 
 type testNestedComment struct {
@@ -64,5 +64,7 @@ func TestDefaults_setDefaults(t *testing.T) {
 	assert.Equal(t, "default comment 1", cnf.Comment1)
 	assert.Equal(t, "default comment 2", cnf.Comment2)
 	assert.Equal(t, "default comment 3", cnf.Comment3)
-	assert.Equal(t, 10, cnf.Count)
+	assert.Equal(t, 12, cnf.Count)
+
+	m.PrintConfig()
 }
