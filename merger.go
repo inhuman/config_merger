@@ -153,9 +153,9 @@ func processPrint(t reflect.Type, v reflect.Value, offset string) {
 				case reflect.String:
 					fmt.Println(offset + field.Name + ": " + value.String())
 				case reflect.Int:
-					fmt.Printf(offset+field.Name+": %d", value.Int)
+					fmt.Printf(offset+field.Name+": %d\n", value.Int)
 				case reflect.Bool:
-					fmt.Printf(offset+field.Name+": %t", value.Bool())
+					fmt.Printf(offset+field.Name+": %t\n", value.Bool())
 				}
 			}
 		}
