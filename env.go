@@ -42,6 +42,9 @@ func (e *EnvSource) processEnvTags(t reflect.Type, v reflect.Value) error {
 			v := os.Getenv(column)
 
 			if v != "" {
+
+				v = trimQuotes(v)
+
 				switch value.Kind() {
 				case reflect.String:
 					value.SetString(v)
@@ -64,6 +67,16 @@ func (e *EnvSource) processEnvTags(t reflect.Type, v reflect.Value) error {
 		}
 	}
 	return nil
+}
+
+func trimQuotes(s string) string {
+	if len(s) > 0 && s[0] == '"' {
+		s = s[1:]
+	}
+	if len(s) > 0 && s[len(s)-1] == '"' {
+		s = s[:len(s)-1]
+	}
+	return s
 }
 
 func (e *EnvSource) Watch(done chan bool, group *sync.WaitGroup) {
