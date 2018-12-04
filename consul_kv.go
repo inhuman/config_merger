@@ -93,7 +93,7 @@ func processConsulTags(t reflect.Type, v reflect.Value, configMap *consul_kv_map
 
 func processPath(configMap *consul_kv_mapper.MapType, columnSlice []string, v reflect.Value) {
 
-	if configMap.Value != "" {
+	if len(configMap.Children) < 1 {
 		v.SetString(string(configMap.Value))
 	} else {
 		processPath(configMap.Children[consul_kv_mapper.KeyType(columnSlice[0])], columnSlice[1:], v)
