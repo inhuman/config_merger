@@ -1,18 +1,18 @@
 package config_merger
 
 import (
-	"testing"
-	"os"
-	"path/filepath"
 	"fmt"
-	"time"
 	"github.com/stretchr/testify/assert"
 	"gopkg.in/h2non/gock.v1"
 	"net/http"
+	"os"
+	"path/filepath"
+	"testing"
+	"time"
 )
 
 type Cnf struct {
-	Message string `json:"message"`
+	Message string `json:"message" vault:"message"`
 }
 
 type NestedConf struct {
@@ -205,8 +205,9 @@ func TestMerger_FullTest(t *testing.T) {
 	m.AddSource(vaultSource)
 	m.AddSource(kvSource)
 
-	m.Run()
+	err := m.Run()
 
+	assert.NoError(t, err)
 	assert.Equal(t, "redis.example.local", conf.Redis.Host)
 	assert.Equal(t, "5001", conf.Redis.Port)
 	assert.Equal(t, "prod_", conf.Redis.ChannelPrefix)
