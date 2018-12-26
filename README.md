@@ -25,7 +25,7 @@ type Config struct {
 	Login          string `json:"login" env:"ENV_LOGIN" consul:"login"`
 	Password       string `json:"password" env:"ENV_PASSWORD" consul:"nested_password/pass_1"`
 	NestedPassword struct {
-		Pass1 string `json:"pass_1" vault:"pass_1" env:"ENV_PASSWORD" consul:"nested_password/another_level/key"`
+		Pass1 string `json:"pass_1" vault:"db/admin:pass_1" env:"ENV_PASSWORD" consul:"nested_password/another_level/key"`
 	} `json:"nested_password"`
 }
 
@@ -63,7 +63,7 @@ func main()  {
 	// add vault source
 	vaultSource := &configMerger.VaultSource{
 		Address: "http://vault.addr:8200",
-		Prefix: "secret/test/config_merger",
+		Prefix: "secret/service/",
 		Token: "vault_token",
 	}
 	merger.AddSource(vaultSource)
