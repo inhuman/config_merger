@@ -5,7 +5,9 @@ Config tool for merge configs from different sources.
 Now supports:
 - json file (simple)
 - consul kv (simple, watch)
+- consul kv json (simple, watch)
 - vault (simple)
+- env (simple)
 
 
 ### Usage
@@ -103,16 +105,6 @@ func main()  {
 
 	merger := configMerger.NewMerger(strct)
 
-	// add json source
-	jsonSource := &configMerger.JsonSource{
-		Path: "/path/to/json",
-		WatchHandler: func() {
-            fmt.Println("json watcher")
-            watcher(confStruct)
-        },
-	}
-	merger.AddSource(jsonSource)
-
 	// add consul kv source
 	consulKvSource := &configMerger.KvSource{
 		Address: "consul.addr:8500",
@@ -137,25 +129,34 @@ func main()  {
 	}
 	m.AddSource(kvSource2)
 
-	// add vault source
-	vaultSource := &configMerger.VaultSource{
-		Address: "http://vault.addr:8200",
-		Prefix: "secret/test/config_merger",
-		Token: "vault_token",
-	}
-	merger.AddSource(vaultSource)
-
 	merger.RunWatch()
 }
 
 func watcher(confStruct *Config) {
-
 	fmt.Printf("Message: %s\n", confStruct.Message)
-	fmt.Printf("IntValue: %v\n", confStruct.IntValue)
-	fmt.Printf("FloatValue: %v\n", confStruct.FloatValue)
-	fmt.Printf("Login: %s\n", confStruct.Login)
-	fmt.Printf("Password: %s\n", confStruct.Password)
-	fmt.Println()
 }
 
+```
+#### Dynamic field names 
+
+Supported by consul-kv, vault, env sources
+
+Tag has higher priority
+
+```golang
+
+type CnfTag struct {
+	Message string `json:"message" tagId:"cnf_tag_message"`
+}
+
+vaultSource := &VaultSource{
+    Address: "http://vault.example.local",
+    Token:   "dummy_token",
+    Prefix:  "secret/test/config_merger",
+}
+	
+vaultSource.TagIds = map[string]string{
+    "cnf_tag_message": "message",
+}
+	
 ```
