@@ -12,23 +12,24 @@ import (
 )
 
 type ConsulKvJsonSource struct {
-	Address      string
-	Datacenter   string
-	Prefix       string // like this "prefix" (without the /)
-	HttpClient   *http.Client
-	WatchHandler func()
-	TargetStruct interface{}
-	Timeout      time.Duration // timeout if disconnect exit
+	SourceModel
+	Address    string
+	Datacenter string
+	Prefix     string // like this "prefix" (without the /)
+	HttpClient *http.Client
+	Timeout    time.Duration // timeout if disconnect exit
 }
 
-func (j *ConsulKvJsonSource) Load() error {
+//TODO: implement tag ids in consul kv json
+
+func (s *ConsulKvJsonSource) Load() error {
 
 	cnf := api.DefaultConfig()
-	cnf.Address = j.Address
-	cnf.Datacenter = j.Datacenter
+	cnf.Address = s.Address
+	cnf.Datacenter = s.Datacenter
 
-	if j.HttpClient != nil {
-		cnf.HttpClient = j.HttpClient
+	if s.HttpClient != nil {
+		cnf.HttpClient = s.HttpClient
 	}
 
 	Client, err := api.NewClient(cnf)
@@ -37,14 +38,14 @@ func (j *ConsulKvJsonSource) Load() error {
 		return err
 	}
 
-	kvPair, _, err := Client.KV().Get(j.Prefix, nil)
+	kvPair, _, err := Client.KV().Get(s.Prefix, nil)
 
 	if err != nil {
 		return err
 	}
 
 	if kvPair != nil {
-		err = json.Unmarshal([]byte(kvPair.Value), j.TargetStruct)
+		err = json.Unmarshal([]byte(kvPair.Value), s.TargetStruct)
 		if err != nil {
 			return err
 		}
@@ -55,32 +56,32 @@ func (j *ConsulKvJsonSource) Load() error {
 	return nil
 }
 
-func (j *ConsulKvJsonSource) SetTargetStruct(s interface{}) {
-	j.TargetStruct = s
+func (s *ConsulKvJsonSource) SetTargetStruct(i interface{}) {
+	s.TargetStruct = i
 }
 
-func (j *ConsulKvJsonSource) SetHttpClient(httpClient *http.Client) {
-	j.HttpClient = httpClient
+func (s *ConsulKvJsonSource) SetHttpClient(httpClient *http.Client) {
+	s.HttpClient = httpClient
 }
 
-func (j *ConsulKvJsonSource) Watch(done chan bool, group *sync.WaitGroup) {
+func (s *ConsulKvJsonSource) Watch(done chan bool, group *sync.WaitGroup) {
 
-	if j.WatchHandler != nil {
-		wp, err := watch.Parse(map[string]interface{}{"type": "keyprefix", "prefix": j.Prefix})
+	if s.WatchHandler != nil {
+		wp, err := watch.Parse(map[string]interface{}{"type": "keyprefix", "prefix": s.Prefix})
 
 		if err != nil {
 			return
 		}
 
-		wp.Datacenter = j.Datacenter
+		wp.Datacenter = s.Datacenter
 		wp.Handler = func(u uint64, i interface{}) {
 			group.Add(1)
-			j.handle(u, i)
+			s.handle(u, i)
 			group.Done()
 		}
 
 		go func() {
-			err = wp.Run(j.Address)
+			err = wp.Run(s.Address)
 			if err != nil {
 				fmt.Println(err)
 			}
@@ -90,7 +91,7 @@ func (j *ConsulKvJsonSource) Watch(done chan bool, group *sync.WaitGroup) {
 	}
 }
 
-func (j *ConsulKvJsonSource) handle(u uint64, i interface{}) {
+func (s *ConsulKvJsonSource) handle(u uint64, i interface{}) {
 
 	if i == nil {
 		return
@@ -101,10 +102,14 @@ func (j *ConsulKvJsonSource) handle(u uint64, i interface{}) {
 		return
 	}
 
-	err := j.Load()
+	err := s.Load()
 	if err == nil {
-		j.WatchHandler()
+		s.WatchHandler()
 	} else {
 		fmt.Println(err)
 	}
+}
+
+func (s *ConsulKvJsonSource) GetTagIds() map[string]string {
+	return s.TagIds
 }
