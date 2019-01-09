@@ -8,17 +8,16 @@ import (
 )
 
 type EnvSource struct {
-	Variables    []string
-	TargetStruct interface{}
-	WatchHandler func()
+	SourceModel
+	Variables []string
 }
 
-func (e *EnvSource) Load() error {
+func (s *EnvSource) Load() error {
 
-	t := reflect.TypeOf(e.TargetStruct).Elem()
-	v := reflect.ValueOf(e.TargetStruct).Elem()
+	t := reflect.TypeOf(s.TargetStruct).Elem()
+	v := reflect.ValueOf(s.TargetStruct).Elem()
 
-	err := e.processEnvTags(t, v)
+	err := s.processEnvTags(t, v)
 	if err != nil {
 		return err
 	}
@@ -26,19 +25,21 @@ func (e *EnvSource) Load() error {
 	return nil
 }
 
-func (e *EnvSource) processEnvTags(t reflect.Type, v reflect.Value) error {
+func (s *EnvSource) processEnvTags(t reflect.Type, v reflect.Value) error {
 
 	for i := 0; i < t.NumField(); i++ {
 		field := t.Field(i)
 		value := v.Field(i)
 
 		if field.Type.Kind() == reflect.Struct {
-			e.processEnvTags(field.Type, value)
+			if err := s.processEnvTags(field.Type, value); err != nil {
+				return err
+			}
 		}
 
-		column := field.Tag.Get("env")
+		column := GetTagContents(s, "env", field)
 
-		if (column != "") && (StringInSlice(column, e.Variables)) {
+		if (column != "") && (StringInSlice(column, s.Variables)) {
 			v := os.Getenv(column)
 
 			if v != "" {
@@ -79,10 +80,14 @@ func trimQuotes(s string) string {
 	return s
 }
 
-func (e *EnvSource) Watch(done chan bool, group *sync.WaitGroup) {
+func (s *EnvSource) Watch(done chan bool, group *sync.WaitGroup) {
 	<-done
 }
 
-func (e *EnvSource) SetTargetStruct(i interface{}) {
-	e.TargetStruct = i
+func (s *EnvSource) SetTargetStruct(i interface{}) {
+	s.TargetStruct = i
+}
+
+func (s *EnvSource) GetTagIds() map[string]string {
+	return s.TagIds
 }

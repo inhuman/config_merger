@@ -251,3 +251,48 @@ func TestMerger_VaultSourceParsePrefixName(t *testing.T) {
 	assert.Equal(t, "", prefix)
 	assert.Equal(t, "", name)
 }
+
+type CnfTag struct {
+	Message string `json:"message" tagId:"cnf_tag_message"`
+}
+
+func TestVaultSource_TagIdsLoadSuccess(t *testing.T) {
+	defer gock.Off()
+
+	gock.New("http://vault.example.local").
+		Get("/v1/secret/test/config_merger").
+		Reply(200).
+		BodyString(`{
+    "request_id": "fde655e4-d755-6cad-10e5-c0ed790b66ed",
+    "lease_id": "",
+    "renewable": false,
+    "lease_duration": 2764800,
+    "data": {
+        "message": "from vault"
+    },
+    "wrap_info": null,
+    "warnings": null,
+    "auth": null
+}`)
+
+	vaultSource := &VaultSource{
+		Address: "http://vault.example.local",
+		Token:   "dummy_token",
+		Prefix:  "secret/test/config_merger",
+	}
+	vaultSource.TagIds = map[string]string{
+		"cnf_tag_message": "message",
+	}
+
+	cnf := &CnfTag{}
+
+	client := &http.Client{Transport: &http.Transport{}, Timeout: time.Microsecond}
+	gock.InterceptClient(client)
+
+	vaultSource.SetHttpClient(client)
+	vaultSource.SetTargetStruct(cnf)
+
+	err := vaultSource.Load()
+	assert.NoError(t, err)
+	assert.Equal(t, "from vault", cnf.Message)
+}

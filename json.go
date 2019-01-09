@@ -10,20 +10,21 @@ import (
 )
 
 type JsonSource struct {
-	Path         string
-	TargetStruct interface{}
-	WatchHandler func()
+	SourceModel
+	Path string
 }
 
-func (j *JsonSource) Load() error {
+//TODO: implement tag ids in json source
 
-	file, err := ioutil.ReadFile(j.Path)
+func (s *JsonSource) Load() error {
+
+	file, err := ioutil.ReadFile(s.Path)
 
 	if err != nil {
 		return err
 	}
 
-	err = json.Unmarshal([]byte(file), j.TargetStruct)
+	err = json.Unmarshal([]byte(file), s.TargetStruct)
 	if err != nil {
 		return err
 	}
@@ -31,13 +32,13 @@ func (j *JsonSource) Load() error {
 	return nil
 }
 
-func (j *JsonSource) SetTargetStruct(i interface{}) {
-	j.TargetStruct = i
+func (s *JsonSource) SetTargetStruct(i interface{}) {
+	s.TargetStruct = i
 }
 
-func (j *JsonSource) Watch(done chan bool, group *sync.WaitGroup) {
+func (s *JsonSource) Watch(done chan bool, group *sync.WaitGroup) {
 
-	if j.WatchHandler != nil {
+	if s.WatchHandler != nil {
 		w := watcher.New()
 		w.SetMaxEvents(1)
 
@@ -45,7 +46,7 @@ func (j *JsonSource) Watch(done chan bool, group *sync.WaitGroup) {
 
 		handler := func() {
 			group.Add(1)
-			j.WatchHandler()
+			s.WatchHandler()
 			group.Done()
 		}
 
@@ -53,7 +54,7 @@ func (j *JsonSource) Watch(done chan bool, group *sync.WaitGroup) {
 			for {
 				select {
 				case <-w.Event:
-					err := j.Load()
+					err := s.Load()
 					if err == nil {
 						handler()
 					} else {
@@ -68,7 +69,7 @@ func (j *JsonSource) Watch(done chan bool, group *sync.WaitGroup) {
 			}
 		}()
 
-		if err := w.Add(j.Path); err != nil {
+		if err := w.Add(s.Path); err != nil {
 			fmt.Println(err)
 		}
 
@@ -76,4 +77,8 @@ func (j *JsonSource) Watch(done chan bool, group *sync.WaitGroup) {
 			fmt.Println(err)
 		}
 	}
+}
+
+func (s *JsonSource) GetTagIds() map[string]string {
+	return s.TagIds
 }

@@ -11,20 +11,20 @@ import (
 )
 
 type VaultSource struct {
-	Address      string
-	Token        string
-	Prefix       string
-	HttpClient   *http.Client
-	TargetStruct interface{}
-	Client       *api.Client
+	SourceModel
+	Address    string
+	Token      string
+	Prefix     string
+	HttpClient *http.Client
+	Client     *api.Client
 }
 
-func (j *VaultSource) Load() error {
+func (s *VaultSource) Load() error {
 
 	config := api.DefaultConfig()
 
-	if j.HttpClient != nil {
-		config.HttpClient = j.HttpClient
+	if s.HttpClient != nil {
+		config.HttpClient = s.HttpClient
 	}
 
 	client, err := api.NewClient(config)
@@ -33,16 +33,16 @@ func (j *VaultSource) Load() error {
 	}
 
 	tokenHeader := http.Header{}
-	tokenHeader.Set("X-Vault-Token", j.Token)
+	tokenHeader.Set("X-Vault-Token", s.Token)
 
-	if err := client.SetAddress(j.Address); err != nil {
+	if err := client.SetAddress(s.Address); err != nil {
 		return err
 	}
 
 	client.SetHeaders(tokenHeader)
-	j.Client = client
+	s.Client = client
 
-	err = j.fillFieldsByTags(j.TargetStruct, []byte{})
+	err = s.fillFieldsByTags(s.TargetStruct, []byte{})
 	if err != nil {
 		return err
 	}
@@ -50,10 +50,10 @@ func (j *VaultSource) Load() error {
 	return nil
 }
 
-func (j *VaultSource) readByPrefix(prefix string) ([]byte, error) {
+func (s *VaultSource) readByPrefix(prefix string) ([]byte, error) {
 
-	fullPrefix := j.Prefix + prefix
-	secret, err := j.Client.Logical().Read(fullPrefix)
+	fullPrefix := s.Prefix + prefix
+	secret, err := s.Client.Logical().Read(fullPrefix)
 
 	if err != nil {
 		return nil, err
@@ -66,32 +66,31 @@ func (j *VaultSource) readByPrefix(prefix string) ([]byte, error) {
 	return nil, errors.New("Vault entry " + fullPrefix + " is empty")
 }
 
-func (j *VaultSource) processVaultTags(t reflect.Type, v reflect.Value, b []byte) error {
+func (s *VaultSource) processVaultTags(t reflect.Type, v reflect.Value, b []byte) error {
 
 	for i := 0; i < t.NumField(); i++ {
 		field := t.Field(i)
 		value := v.Field(i)
 
 		if field.Type.Kind() == reflect.Struct {
-			err := j.processVaultTags(field.Type, value, b)
+			err := s.processVaultTags(field.Type, value, b)
 			if err != nil {
 				return err
 			}
 			continue
 		}
 
-		column := field.Tag.Get("vault")
-
-		field.Tag = ""
+		column := GetTagContents(s, "vault", field)
 
 		if column != "" {
+			field.Tag = ""
 
-			prefix, name, err := j.getPrefixAndName(column)
+			prefix, name, err := s.getPrefixAndName(column)
 			if err != nil {
 				return err
 			}
 
-			b, err = j.readByPrefix(prefix)
+			b, err = s.readByPrefix(prefix)
 			if err != nil {
 				return err
 			}
@@ -111,7 +110,7 @@ func (j *VaultSource) processVaultTags(t reflect.Type, v reflect.Value, b []byte
 	return nil
 }
 
-func (j *VaultSource) getPrefixAndName(tag string) (string, string, error) {
+func (s *VaultSource) getPrefixAndName(tag string) (string, string, error) {
 
 	tagParts := strings.Split(tag, ":")
 
@@ -123,7 +122,7 @@ func (j *VaultSource) getPrefixAndName(tag string) (string, string, error) {
 	case len(tagParts) == 2:
 		return tagParts[0], tagParts[1], nil
 
-	case len(tagParts) == 1 && j.Prefix == "":
+	case len(tagParts) == 1 && s.Prefix == "":
 
 		prefixParts := strings.Split(tag, "/")
 		if len(prefixParts) > 1 {
@@ -131,7 +130,7 @@ func (j *VaultSource) getPrefixAndName(tag string) (string, string, error) {
 		}
 		return "", "", errors.New("Unconditional tag `" + tag + "` - missing prefix")
 
-	case len(tagParts) == 1 && j.Prefix != "":
+	case len(tagParts) == 1 && s.Prefix != "":
 		return "", tagParts[0], nil
 	default:
 		return "", "", errors.New("Parsing `" + tag + "` prefix and field name unknown error")
@@ -139,12 +138,12 @@ func (j *VaultSource) getPrefixAndName(tag string) (string, string, error) {
 }
 
 // receive pointer to struct
-func (j *VaultSource) fillFieldsByTags(i interface{}, b []byte) error {
+func (s *VaultSource) fillFieldsByTags(i interface{}, b []byte) error {
 
 	t := reflect.TypeOf(i).Elem()
 	v := reflect.ValueOf(i).Elem()
 
-	err := j.processVaultTags(t, v, b)
+	err := s.processVaultTags(t, v, b)
 	if err != nil {
 		return err
 	}
@@ -152,14 +151,18 @@ func (j *VaultSource) fillFieldsByTags(i interface{}, b []byte) error {
 	return nil
 }
 
-func (j *VaultSource) SetTargetStruct(s interface{}) {
-	j.TargetStruct = s
+func (s *VaultSource) SetTargetStruct(i interface{}) {
+	s.TargetStruct = i
 }
 
-func (j *VaultSource) SetHttpClient(httpClient *http.Client) {
-	j.HttpClient = httpClient
+func (s *VaultSource) SetHttpClient(httpClient *http.Client) {
+	s.HttpClient = httpClient
 }
 
-func (j *VaultSource) Watch(done chan bool, group *sync.WaitGroup) {
+func (s *VaultSource) GetTagIds() map[string]string {
+	return s.TagIds
+}
+
+func (s *VaultSource) Watch(done chan bool, group *sync.WaitGroup) {
 	<-done
 }

@@ -43,6 +43,8 @@ func isDuplicateTags(t reflect.Type, tags []string) error {
 			continue
 		}
 
+		//TODO: add checks for other tags
+
 		column := field.Tag.Get("vault")
 
 		if column != "" {

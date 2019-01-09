@@ -17,9 +17,16 @@ type Merger struct {
 	done               chan bool
 }
 
+type SourceModel struct {
+	TagIds       map[string]string
+	TargetStruct interface{}
+	WatchHandler func()
+}
+
 type Source interface {
 	Load() error
 	SetTargetStruct(s interface{})
+	GetTagIds() map[string]string
 	Watch(done chan bool, group *sync.WaitGroup)
 }
 

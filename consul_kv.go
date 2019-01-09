@@ -13,23 +13,22 @@ import (
 )
 
 type ConsulKvSource struct {
-	Address      string
-	Datacenter   string
-	Prefix       string // like this "prefix" (without the /)
-	HttpClient   *http.Client
-	WatchHandler func()
-	TargetStruct interface{}
-	Timeout      time.Duration // timeout if disconnect exit
+	SourceModel
+	Address    string
+	Datacenter string
+	Prefix     string // like this "prefix" (without the /)
+	HttpClient *http.Client
+	Timeout    time.Duration // timeout if disconnect exit
 }
 
-func (ckv *ConsulKvSource) Load() error {
+func (s *ConsulKvSource) Load() error {
 
 	cnf := api.DefaultConfig()
-	cnf.Address = ckv.Address
-	cnf.Datacenter = ckv.Datacenter
+	cnf.Address = s.Address
+	cnf.Datacenter = s.Datacenter
 
-	if ckv.HttpClient != nil {
-		cnf.HttpClient = ckv.HttpClient
+	if s.HttpClient != nil {
+		cnf.HttpClient = s.HttpClient
 	}
 
 	client, err := api.NewClient(cnf)
@@ -38,41 +37,45 @@ func (ckv *ConsulKvSource) Load() error {
 		return err
 	}
 
-	configMap, err := consul_kv_mapper.BuildMap(client, ckv.Prefix)
+	configMap, err := consul_kv_mapper.BuildMap(client, s.Prefix)
 
 	if err != nil {
 		return err
 	}
 
-	ckv.buildConfig(configMap)
+	if err := s.buildConfig(configMap); err != nil {
+		return err
+	}
 
 	return nil
 }
 
-func (ckv *ConsulKvSource) buildConfig(configMap *consul_kv_mapper.MapType) {
+func (s *ConsulKvSource) buildConfig(configMap *consul_kv_mapper.MapType) error {
 
-	t := reflect.TypeOf(ckv.TargetStruct).Elem()
-	v := reflect.ValueOf(ckv.TargetStruct).Elem()
+	t := reflect.TypeOf(s.TargetStruct).Elem()
+	v := reflect.ValueOf(s.TargetStruct).Elem()
 
-	processConsulTags(t, v, configMap)
-
+	if err := s.processConsulTags(t, v, configMap); err != nil {
+		return err
+	}
+	return nil
 }
 
-func processConsulTags(t reflect.Type, v reflect.Value, configMap *consul_kv_mapper.MapType) error {
+func (s *ConsulKvSource) processConsulTags(t reflect.Type, v reflect.Value, configMap *consul_kv_mapper.MapType) error {
 
 	for i := 0; i < t.NumField(); i++ {
 		field := t.Field(i)
 		value := v.Field(i)
 
 		if field.Type.Kind() == reflect.Struct {
-			err := processConsulTags(field.Type, value, configMap)
+			err := s.processConsulTags(field.Type, value, configMap)
 			if err != nil {
 				return err
 			}
 			continue
 		}
 
-		column := field.Tag.Get("consul")
+		column := GetTagContents(s, "consul", field)
 
 		if column != "" {
 			columnSlice := strings.Split(column, "/")
@@ -101,32 +104,32 @@ func processPath(configMap *consul_kv_mapper.MapType, columnSlice []string, v re
 
 }
 
-func (ckv *ConsulKvSource) SetTargetStruct(s interface{}) {
-	ckv.TargetStruct = s
+func (s *ConsulKvSource) SetTargetStruct(i interface{}) {
+	s.TargetStruct = i
 }
 
-func (ckv *ConsulKvSource) SetHttpClient(httpClient *http.Client) {
-	ckv.HttpClient = httpClient
+func (s *ConsulKvSource) SetHttpClient(httpClient *http.Client) {
+	s.HttpClient = httpClient
 }
 
-func (ckv *ConsulKvSource) Watch(done chan bool, group *sync.WaitGroup) {
+func (s *ConsulKvSource) Watch(done chan bool, group *sync.WaitGroup) {
 
-	if ckv.WatchHandler != nil {
-		wp, err := watch.Parse(map[string]interface{}{"type": "keyprefix", "prefix": ckv.Prefix})
+	if s.WatchHandler != nil {
+		wp, err := watch.Parse(map[string]interface{}{"type": "keyprefix", "prefix": s.Prefix})
 
 		if err != nil {
 			return
 		}
 
-		wp.Datacenter = ckv.Datacenter
+		wp.Datacenter = s.Datacenter
 		wp.Handler = func(u uint64, i interface{}) {
 			group.Add(1)
-			ckv.handle(u, i)
+			s.handle(u, i)
 			group.Done()
 		}
 
 		go func() {
-			err = wp.Run(ckv.Address)
+			err = wp.Run(s.Address)
 			if err != nil {
 				fmt.Println(err)
 			}
@@ -136,7 +139,7 @@ func (ckv *ConsulKvSource) Watch(done chan bool, group *sync.WaitGroup) {
 	}
 }
 
-func (ckv *ConsulKvSource) handle(u uint64, i interface{}) {
+func (s *ConsulKvSource) handle(u uint64, i interface{}) {
 
 	if i == nil {
 		return
@@ -147,10 +150,14 @@ func (ckv *ConsulKvSource) handle(u uint64, i interface{}) {
 		return
 	}
 
-	err := ckv.Load()
+	err := s.Load()
 	if err == nil {
-		ckv.WatchHandler()
+		s.WatchHandler()
 	} else {
 		fmt.Println(err)
 	}
+}
+
+func (s *ConsulKvSource) GetTagIds() map[string]string {
+	return s.TagIds
 }
