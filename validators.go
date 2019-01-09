@@ -78,12 +78,13 @@ func (m *Merger) checkRequiredFields() error {
 
 func processRequiredTags(t reflect.Type, v reflect.Value, err *multierror.Error, parentConfig string) *multierror.Error {
 
+	parentConfig += t.Name() + "."
+
 	for i := 0; i < t.NumField(); i++ {
 		field := t.Field(i)
 		value := v.Field(i)
 
 		if field.Type.Kind() == reflect.Struct {
-			parentConfig += t.Name() + "."
 			err = processRequiredTags(field.Type, value, err, parentConfig)
 		}
 
@@ -94,13 +95,13 @@ func processRequiredTags(t reflect.Type, v reflect.Value, err *multierror.Error,
 			switch value.Kind() {
 			case reflect.String:
 				if value.String() == "" {
-					newErr := errors.New("Required value " + parentConfig + t.Name() + "." + field.Name + " is empty")
+					newErr := errors.New("Required value " + parentConfig + "." + field.Name + " is empty")
 					err = multierror.Append(err, newErr)
 				}
 
 			case reflect.Int:
 				if value.Int() == 0 {
-					newErr := errors.New("Required value " + parentConfig + t.Name() + "." + field.Name + " is 0 (can not be)")
+					newErr := errors.New("Required value " + parentConfig + "." + field.Name + " is 0 (can not be)")
 					err = multierror.Append(err, newErr)
 				}
 			}
