@@ -91,13 +91,13 @@ func processRequiredTags(t reflect.Type, v reflect.Value, err *multierror.Error)
 			switch value.Kind() {
 			case reflect.String:
 				if value.String() == "" {
-					newErr := errors.New("Required value " + field.Name + " is empty")
+					newErr := errors.New("Required value " + field.Name + "(" + column + ") is empty")
 					err = multierror.Append(err, newErr)
 				}
 
 			case reflect.Int:
 				if value.Int() == 0 {
-					newErr := errors.New("Required value " + field.Name + " is empty")
+					newErr := errors.New("Required value " + field.Name + "(" + column + ") is 0 (can not be)")
 					err = multierror.Append(err, newErr)
 				}
 			}
