@@ -65,6 +65,4 @@ func TestDefaults_setDefaults(t *testing.T) {
 	assert.Equal(t, "default comment 2", cnf.Comment2)
 	assert.Equal(t, "default comment 3", cnf.Comment3)
 	assert.Equal(t, 12, cnf.Count)
-
-	m.PrintConfig()
 }
