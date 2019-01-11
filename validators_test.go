@@ -147,9 +147,9 @@ func TestCheckRequiredFieldsSuccessENVComplexStruct(t *testing.T) {
 	err := m.Run()
 
 	expectredErr := &multierror.Error{}
-	multierror.Append(expectredErr, errors.New("Required value Comment is empty"))
-	multierror.Append(expectredErr, errors.New("Required value Password is empty"))
-	multierror.Append(expectredErr, errors.New("Required value Host is empty"))
+	expectredErr = multierror.Append(expectredErr, errors.New("Required value testAggregateData.Comment is empty"))
+	expectredErr = multierror.Append(expectredErr, errors.New("Required value testAggregateData.testUserModel.Password is empty"))
+	expectredErr = multierror.Append(expectredErr, errors.New("Required value testAggregateData.testDbConnection.Host is empty"))
 
 	assert.Equal(t, expectredErr, err)
 }
