@@ -119,7 +119,6 @@ func (s *ConsulKvSource) processConsulTags(t reflect.Type, v reflect.Value, conf
 func processPath(configMap *consul_kv_mapper.MapType, columnSlice []string, v reflect.Value) error {
 
 	if len(configMap.Children) < 1 {
-		v.SetString(string(configMap.Value))
 
 		switch v.Kind() {
 		case reflect.String:
