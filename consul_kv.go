@@ -105,7 +105,10 @@ func (s *ConsulKvSource) processConsulTags(t reflect.Type, v reflect.Value, conf
 					}
 
 				} else {
-					processPath(child, columnSlice[1:], value)
+					err := processPath(child, columnSlice[1:], value)
+					if err != nil {
+						return err
+					}
 				}
 			}
 		}
@@ -113,14 +116,37 @@ func (s *ConsulKvSource) processConsulTags(t reflect.Type, v reflect.Value, conf
 	return nil
 }
 
-func processPath(configMap *consul_kv_mapper.MapType, columnSlice []string, v reflect.Value) {
+func processPath(configMap *consul_kv_mapper.MapType, columnSlice []string, v reflect.Value) error {
 
 	if len(configMap.Children) < 1 {
 		v.SetString(string(configMap.Value))
-	} else {
-		processPath(configMap.Children[consul_kv_mapper.KeyType(columnSlice[0])], columnSlice[1:], v)
-	}
 
+		switch v.Kind() {
+		case reflect.String:
+			v.SetString(string(configMap.Value))
+
+		case reflect.Int:
+			i, err := strconv.ParseInt(string(configMap.Value), 10, 64)
+			if err != nil {
+				return err
+			}
+			v.SetInt(i)
+
+		case reflect.Bool:
+			b, err := strconv.ParseBool(string(configMap.Value))
+			if err != nil {
+				return err
+			}
+			v.SetBool(b)
+		}
+
+	} else {
+		err := processPath(configMap.Children[consul_kv_mapper.KeyType(columnSlice[0])], columnSlice[1:], v)
+		if err != nil {
+			return err
+		}
+	}
+	return nil
 }
 
 func (s *ConsulKvSource) SetTargetStruct(i interface{}) {
