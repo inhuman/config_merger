@@ -7,6 +7,7 @@ import (
 	"github.com/inhuman/consul-kv-mapper"
 	"net/http"
 	"reflect"
+	"strconv"
 	"strings"
 	"sync"
 	"time"
@@ -83,8 +84,26 @@ func (s *ConsulKvSource) processConsulTags(t reflect.Type, v reflect.Value, conf
 
 			if child != nil {
 				if len(columnSlice) < 2 {
-					//TODO: add int and float types, just in case
-					value.SetString(string(child.Value))
+
+					switch value.Kind() {
+					case reflect.String:
+						value.SetString(string(child.Value))
+
+					case reflect.Int:
+						i, err := strconv.ParseInt(string(child.Value), 10, 64)
+						if err != nil {
+							return err
+						}
+						value.SetInt(i)
+
+					case reflect.Bool:
+						b, err := strconv.ParseBool(string(child.Value))
+						if err != nil {
+							return err
+						}
+						value.SetBool(b)
+					}
+
 				} else {
 					processPath(child, columnSlice[1:], value)
 				}
