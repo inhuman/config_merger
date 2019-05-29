@@ -134,39 +134,70 @@ func (m *Merger) PrintConfig() {
 
 func processPrint(t reflect.Type, v reflect.Value, offset string) {
 
-	for i := 0; i < t.NumField(); i++ {
-		field := t.Field(i)
-		value := v.Field(i)
+	if t.Kind() == reflect.Map {
 
-		if field.Type.Kind() == reflect.Struct {
-			fmt.Println(offset + field.Name)
-			processPrint(field.Type, value, offset+"  ")
+		iter := v.MapRange()
+		for iter.Next() {
+			k := iter.Key()
+			value := iter.Value()
 
-		} else {
+			switch reflect.ValueOf(value.Interface()).Kind() {
 
-			column := field.Tag.Get("show_last_symbols")
-			if column != "" {
+			case reflect.Map:
+				fmt.Println(offset + k.String() + ":")
+				processPrint(reflect.ValueOf(value.Interface()).Type(), reflect.ValueOf(value.Interface()), offset+"  ")
+			default:
+				fmt.Printf(offset+k.String()+": %+v\n", value)
+			}
+		}
 
-				maskLast, err := strconv.Atoi(column)
-				if err == nil {
-					fmt.Println(offset + field.Name + ": " + maskString(value.String(), maskLast))
-				} else {
-					fmt.Println(err)
-				}
+	} else {
+
+		for i := 0; i < t.NumField(); i++ {
+			field := t.Field(i)
+			value := v.Field(i)
+
+			if field.Type.Kind() == reflect.Struct {
+				fmt.Println(offset + field.Name + ":")
+				processPrint(field.Type, value, offset+"  ")
+
+			} else if field.Type.Kind() == reflect.Ptr {
+				field.Type = field.Type.Elem()
+				value = value.Elem()
+				fmt.Println(offset + field.Name + ":")
+
+				processPrint(field.Type, value, offset+"  ")
 
 			} else {
 
-				switch value.Kind() {
-				case reflect.String:
-					fmt.Println(offset + field.Name + ": " + value.String())
-				case reflect.Int:
-					fmt.Printf(offset+field.Name+": %d\n", value.Int())
-				case reflect.Bool:
-					fmt.Printf(offset+field.Name+": %t\n", value.Bool())
+				column := field.Tag.Get("show_last_symbols")
+				if column != "" {
+
+					maskLast, err := strconv.Atoi(column)
+					if err == nil {
+						fmt.Println(offset + field.Name + ": " + maskString(value.String(), maskLast))
+					} else {
+						fmt.Println(err)
+					}
+
+				} else {
+
+					switch value.Kind() {
+					case reflect.String:
+						fmt.Println(offset + field.Name + ": " + value.String())
+					case reflect.Int:
+						fmt.Printf(offset+field.Name+": %d\n", value.Int())
+					case reflect.Bool:
+						fmt.Printf(offset+field.Name+": %t\n", value.Bool())
+					case reflect.Map:
+						fmt.Println(offset + field.Name + ":")
+						processPrint(field.Type, value, offset+"  ")
+					}
 				}
 			}
 		}
 	}
+
 }
 
 func (m *Merger) StopDisconnectTimeout(address string, timeout time.Duration) {

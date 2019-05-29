@@ -37,6 +37,15 @@ func (s *EnvSource) processEnvTags(t reflect.Type, v reflect.Value) error {
 			}
 		}
 
+		if field.Type.Kind() == reflect.Ptr {
+			field.Type = field.Type.Elem()
+			value = value.Elem()
+
+			if err := s.processEnvTags(field.Type, value); err != nil {
+				return err
+			}
+		}
+
 		column := GetTagContents(s, "env", field)
 
 		if (column != "") && (StringInSlice(column, s.Variables)) {
