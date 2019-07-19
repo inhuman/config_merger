@@ -215,3 +215,16 @@ func TestMerger_FullTest(t *testing.T) {
 	assert.Equal(t, "redus://USDRUB", conf.SymbolsMap["USDRUB"].RedisChannel)
 	assert.Equal(t, 0, conf.SymbolsMap["USDNOK"].Otc)
 }
+
+func TestMerger_FileNotExists(t *testing.T) {
+	merger := NewMerger(&Cnf{})
+
+	jsonSource := &JsonSource{
+		Path: "not-exists.json",
+	}
+	merger.AddSource(jsonSource)
+
+	err := merger.Run()
+
+	assert.Error(t, err)
+}

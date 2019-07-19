@@ -29,6 +29,11 @@ func (s *EnvSource) processEnvTags(t reflect.Type, v reflect.Value) error {
 
 	for i := 0; i < t.NumField(); i++ {
 		field := t.Field(i)
+
+		if !v.IsValid() {
+			continue
+		}
+
 		value := v.Field(i)
 
 		if field.Type.Kind() == reflect.Struct {

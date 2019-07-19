@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"github.com/fatih/structs"
 	"github.com/hashicorp/go-multierror"
+	"log"
 	"net"
 	"reflect"
 	"strconv"
@@ -93,8 +94,13 @@ func (m *Merger) Run() error {
 	var errAll *multierror.Error
 
 	for _, s := range m.Sources {
+
+		log.Println("loading source:", reflect.TypeOf(s).String())
+
 		err := s.Load()
 		if err != nil {
+			log.Println("loading source:", reflect.TypeOf(s).String())
+
 			errAll = multierror.Append(errAll, err)
 		}
 	}
