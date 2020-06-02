@@ -3,7 +3,7 @@ package config_merger
 import (
 	"fmt"
 	"github.com/hashicorp/consul/api"
-	"github.com/hashicorp/consul/watch"
+	"github.com/hashicorp/consul/api/watch"
 	"github.com/inhuman/consul-kv-mapper"
 	"net/http"
 	"reflect"

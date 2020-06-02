@@ -5,7 +5,7 @@ import (
 	"errors"
 	"fmt"
 	"github.com/hashicorp/consul/api"
-	"github.com/hashicorp/consul/watch"
+	"github.com/hashicorp/consul/api/watch"
 	"net/http"
 	"sync"
 	"time"
